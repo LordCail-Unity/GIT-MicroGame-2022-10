@@ -3,6 +3,10 @@ using UnityEngine;
 public class PlayerCollision : MonoBehaviour
 {
 
+    // public LevelManager _levelManager;
+    // Replaced by
+    // FindObjectOfType<LevelManager>().LevelRestart();
+
     private PlayerController _playerController;
     private Rigidbody _rigidbody;
 
@@ -20,7 +24,10 @@ public class PlayerCollision : MonoBehaviour
         {
             _playerController.enabled = false;
             Debug.Log("Movement Disabled: Obstacle");
+
             // RESTART LEVEL
+            // _levelManager.ReloadThisLevel();
+            FindObjectOfType<LevelManager>().ReloadThisLevel();
         }
     }
 
@@ -30,16 +37,25 @@ public class PlayerCollision : MonoBehaviour
         {
             _playerController.enabled = false;
             Debug.Log("Movement Disabled: Finish");
-            // Transition to next scene
+
+            // COMPLETE LEVEL
+            // _levelManager.LoadNextLevel();
+            FindObjectOfType<LevelManager>().LoadNextLevel();
         }
+
         if (triggerCollider.tag == "Killzone")
         {
             _playerController.enabled = false;
             Debug.Log("Movement Disabled: Killzone");
+
+            // SINKING INTO LAVA EFFECT:
             _rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
             _rigidbody.drag = 20;
             Debug.Log("Movement Disabled: Killzone");
+
             // RESTART LEVEL
+            // _levelManager.ReloadThisLevel();
+            FindObjectOfType<LevelManager>().ReloadThisLevel();
         }
     }
 
