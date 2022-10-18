@@ -1,3 +1,18 @@
+// We have GameManager to handle transitions in a single game level. See GameManager notes.
+//
+// How to deal with Start & End scenes?
+//
+// One thing we could do is to set up LevelManager "above" GameManager
+// This would make sense as the LevelManager is looking after Scenes
+// including the Start and EndGame scenes (it should be called SceneManager
+// but this would clash with the Unity class of the same name).
+// 
+// We will probably also introduce a 1RingManager -- a DontDestroyOnLoad to rule them all -- 
+// which can handle game initialization, Save & Load data, and things like settings, audio, etc 
+// 
+// The 1Ring could even instantiate all of the required systems in a linear fashion 
+// giving us full control over startup. 
+
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
