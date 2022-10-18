@@ -3,22 +3,21 @@ using UnityEngine;
 public class MainCamera : MonoBehaviour
 {
 
-    private GameObject Player;
-    private Collider _collider;
+    private GameObject CameraFollowTarget;
 
     public float xOffset, yOffset, zOffset;
 
     private void Awake()
     {
-        Player = GameObject.FindWithTag("Player");
-        _collider = Player.GetComponent<Collider>();
-        Debug.Log("Main Camera: Rigidbody locked and loaded");
+        CameraFollowTarget = GameObject.FindWithTag("CameraFollowTarget");
+        Debug.Log("Main Camera: CameraFollowTarget locked and loaded");
+        //MUST HAVE CameraFollowTarget at center of player gameobject
     }
 
     private void Update()
     {
-        this.transform.position = _collider.transform.position + new Vector3(xOffset, yOffset, zOffset);
-        this.transform.LookAt(_collider.transform.position);
+        this.transform.position = CameraFollowTarget.transform.position + new Vector3(xOffset, yOffset, zOffset);
+        this.transform.LookAt(CameraFollowTarget.transform.position);
     }
 
 }
