@@ -13,7 +13,7 @@ public class LevelManager : MonoBehaviour
 
         GameManager.Instance.UpdateGameState(GameState.LoadLevel); // Update GameState >> LoadLevel state
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-        GameManager.Instance.UpdateGameState(GameState.PlayLevel); // Update GameState >> LoadLevel state
+        GameManager.Instance.UpdateGameState(GameState.PlayLevel); // Update GameState >> PlayLevel state
     }
 
     public void LoadMainMenu()
@@ -30,8 +30,20 @@ public class LevelManager : MonoBehaviour
 
     public void LoadNextLevel()
     {
+        Debug.Log("LevelManager.LoadNextLevel");
+        
         // Eg below = LevelLoader.LoadLevel(nextLevel)
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+
+        //TEMP QUICK CODE
+        var currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        if (currentSceneIndex == SceneManager.sceneCountInBuildSettings)
+        {
+            GameManager.Instance.UpdateGameState(GameState.EndGame);
+            Debug.Log("GameState >> EndGame");
+        }
+        // Update GameState >> EndGame state
+
     }
 
     public void QuitGame()

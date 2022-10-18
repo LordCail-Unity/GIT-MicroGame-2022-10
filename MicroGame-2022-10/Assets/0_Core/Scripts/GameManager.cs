@@ -40,7 +40,10 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        //This will only work for the first level
         UpdateGameState(GameState.StartGame);
+        //Need to either eliminate this or figure out a way to use DontDestroyOnLoad
+        //https://docs.unity3d.com/2020.3/Documentation/ScriptReference/Object.DontDestroyOnLoad.html
     }
 
     public void UpdateGameState(GameState newGameState)
