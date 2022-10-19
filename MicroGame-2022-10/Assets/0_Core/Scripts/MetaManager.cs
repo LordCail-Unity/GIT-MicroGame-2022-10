@@ -19,14 +19,14 @@
 // https://docs.unity3d.com/2020.3/Documentation/ScriptReference/Object.DontDestroyOnLoad.html
 // ..
 
-using System; // Required for:  public static event Action<>
+using System; // Required for..  public static event Action<>
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class LevelManager : MonoBehaviour
+public class MetaManager : MonoBehaviour
 {
 
-    public static LevelManager Instance;
+    public static MetaManager Instance;
     public MetaState _metaState;
 
     public static event Action<MetaState> OnMetaStateChanged;
@@ -63,7 +63,6 @@ public class LevelManager : MonoBehaviour
         OnMetaStateChanged?.Invoke(newMetaState);
     }
 
-
     private void HandleStartGame()
     {
         // Handled by MenuManager
@@ -79,7 +78,7 @@ public class LevelManager : MonoBehaviour
         // Each LevelManager method can refer to the LevelLoader and feed in the level to load
         // Eg below = LevelLoader.LoadLevel(nextLevel)
 
-        LevelManager.Instance.UpdateMetaState(MetaState.LoadLevel); // Update >> LoadLevel state
+        MetaManager.Instance.UpdateMetaState(MetaState.LoadLevel); // Update >> LoadLevel state
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 
@@ -115,7 +114,7 @@ public class LevelManager : MonoBehaviour
         var currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         if (currentSceneIndex == SceneManager.sceneCountInBuildSettings)
         {
-            LevelManager.Instance.UpdateMetaState(MetaState.EndGame);
+            MetaManager.Instance.UpdateMetaState(MetaState.EndGame);
             Debug.Log("MetaState >> EndGame");
         }
 

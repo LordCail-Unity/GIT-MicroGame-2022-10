@@ -27,7 +27,7 @@ public class PlayerCollision : MonoBehaviour
 
             // RESTART LEVEL
             // _levelManager.ReloadThisLevel();
-            FindObjectOfType<LevelManager>().ReloadThisLevel();
+            FindObjectOfType<MetaManager>().ReloadThisLevel();
         }
     }
 
@@ -40,7 +40,7 @@ public class PlayerCollision : MonoBehaviour
 
             // COMPLETE LEVEL
             // _levelManager.LoadNextLevel();
-            FindObjectOfType<LevelManager>().LoadNextLevel();
+            FindObjectOfType<MetaManager>().LoadNextLevel();
         }
 
         if (triggerCollider.tag == "Killzone")
@@ -55,7 +55,7 @@ public class PlayerCollision : MonoBehaviour
 
             // RESTART LEVEL
             // _levelManager.ReloadThisLevel();
-            FindObjectOfType<LevelManager>().ReloadThisLevel();
+            FindObjectOfType<MetaManager>().ReloadThisLevel();
         }
     }
 
