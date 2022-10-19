@@ -21,6 +21,7 @@ public class GameMenuManager : MonoBehaviour
 
     private void GameManager_OnGameStateChanged(GameState state)
     {
+        // Each UI will only be SetActive IF current GameState == GameState.XYZ
         StartLevelUI.SetActive(state == GameState.StartLevel);
         PlayLevelUI.SetActive(state == GameState.PlayLevel);
         RestartLevelUI.SetActive(state == GameState.RestartLevel);

@@ -858,7 +858,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1296665774
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1418,7 +1418,7 @@ PrefabInstance:
       objectReference: {fileID: 872432845}
     - target: {fileID: 7460614312511365396, guid: 33b1efefa5b0c394d98596a8a4ad4215, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: StartGame
+      value: LoadFirstLevel
       objectReference: {fileID: 0}
     - target: {fileID: 7460614312511365396, guid: 33b1efefa5b0c394d98596a8a4ad4215, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName

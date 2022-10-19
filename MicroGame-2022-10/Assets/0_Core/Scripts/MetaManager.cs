@@ -112,13 +112,12 @@ public class MetaManager : MonoBehaviour
         LoadLevel(levelToLoad);
     }
 
-    public async void LoadLevel(int sceneIndex)
+    public void LoadLevel(int sceneIndex)
     {
         // Create Async LevelLoader script with a fake 1 second-ish loading screen 
         // Each MetaManager method can refer to the LevelLoader and feed in the level to load
 
-        var scene = SceneManager.LoadSceneAsync(sceneIndex);
-        scene.allowSceneActivation = false;
+        SceneManager.LoadScene(sceneIndex);
 
         // ADDITIVE LOADING OPTION:
         // (levelToLoad, LoadSceneMode.Additive)

@@ -4,23 +4,36 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
 
+    private Rigidbody _rigidbody; // most commonly "rb" instead of "_rigidbody"
+
     public float forwardForce = 500f;
     public float sidewaysForce = 20f;
 
     // Can add jumping with an IsGrounded check
     // public float jumpForce; 
 
-    private Rigidbody _rigidbody; // most commonly "rb" instead of "_rigidbody"
-
     private float xInput;
 
     // Can add all-direction movement with a zInput check
     // private float zInput; 
 
+    // private bool canMove = false;
+
     private void Awake()
     {
+        GameManager.OnGameStateChanged += GameManager_OnGameStateChanged;
+        Debug.Log("PlayerController: Subscribed to GameManager_OnGameStateChanged");
+
         _rigidbody = this.GetComponent<Rigidbody>();
-        Debug.Log("Player Controller: Rigidbody locked and loaded");
+    }
+
+    private void GameManager_OnGameStateChanged(GameState obj)
+    {
+    }
+
+    private void OnDestroy()
+    {
+        GameManager.OnGameStateChanged -= GameManager_OnGameStateChanged;
     }
 
     private void Update()
@@ -80,3 +93,11 @@ public class PlayerController : MonoBehaviour
     }
 
 }
+
+
+//==NOTES==
+
+
+// if(_rigidbody == null)
+// { Debug.Log("PlayerController: Can't find Rigidbody"); }
+// else { Debug.Log("PlayerController: Rigidbody locked and loaded"); }

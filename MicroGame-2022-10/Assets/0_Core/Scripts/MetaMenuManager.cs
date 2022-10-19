@@ -20,6 +20,8 @@ public class MetaMenuManager : MonoBehaviour
 
     private void MetaManager_OnMetaStateChanged(MetaState state)
     {
+        // Each UI will only be SetActive IF current MetaState == MetaState.XYZ
+
         StartGameUI.SetActive(state == MetaState.StartGame);
         LoadingScreenUI.SetActive(state == MetaState.LoadLevel);
         EndGameUI.SetActive(state == MetaState.EndGame);

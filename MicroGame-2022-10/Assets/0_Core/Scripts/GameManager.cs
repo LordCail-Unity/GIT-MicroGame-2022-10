@@ -1,4 +1,5 @@
 using System; // Required for:  public static event Action<>
+using System.Collections; // Required for IEnumerator Coroutines
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -6,6 +7,8 @@ public class GameManager : MonoBehaviour
 
     public static GameManager Instance;
     public GameState _gameState;
+
+    private PlayerController _playerController;
 
     public static event Action<GameState> OnGameStateChanged;
 
@@ -23,6 +26,12 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        _playerController = FindObjectOfType<PlayerController>();
+
+        if (_playerController == null)
+        { Debug.Log("GameManager: Can't find PlayerController"); }
+        else { Debug.Log("GameManager: PlayerController locked and loaded"); }
+
         UpdateGameState(GameState.StartLevel);
     }
 
@@ -50,9 +59,36 @@ public class GameManager : MonoBehaviour
 
     private void HandleStartLevel()
     {
-        // I think updating the GameState makes most sense inside GameManager..
-        // GameManager.Instance.UpdateGameState(GameState.PlayLevel); 
-        // Update GameState >> PlayLevel
+        StartCoroutine(Countdown());
+    }
+
+    private IEnumerator Countdown()
+    {
+        _playerController.enabled = false;
+        Debug.Log("GameManager: PlayerController disabled");
+
+        int StartLevelDelay = 3; 
+        // Hardcoded delay in seconds
+        yield return StartCoroutine(Wait(StartLevelDelay));
+        // Feeding delay in seconds to Wait coroutine
+
+        _playerController.enabled = true;
+        Debug.Log("GameManager: PlayerController enabled");
+
+        UpdateGameState(GameState.PlayLevel);
+    }
+
+    IEnumerator Wait(int delaySecs)
+    {
+        Debug.Log("GameManager: Waiting started");
+
+        for (int i = 0; i < delaySecs; i++)
+        {
+            yield return new WaitForSecondsRealtime(1);
+            Debug.Log("Waited one second");
+        }
+
+        Debug.Log("GameManager: Waiting completed");
     }
 
     private void HandlePlayLevel()
@@ -66,7 +102,7 @@ public class GameManager : MonoBehaviour
         // --COLLISION--
         // IF TRIGGER = FINISH
         // THEN Update GameState >> CompleteLevel
-        // GameManager.Instance.UpdateGameState(GameState.CompleteLevel); 
+        // UpdateGameState(GameState.CompleteLevel); 
     }
 
     private void HandleRestartLevel()
@@ -101,6 +137,7 @@ public class GameManager : MonoBehaviour
         // PlayerController can't disable itself but GameManager can 
 
     }
+
 
 }
 
@@ -138,6 +175,11 @@ public enum GameState
 // However, it's probably more aimed towards the Turn Based system he outlined where it manages a single 
 // "game" that you are playing rather than managing the whole GameSystem.
 // Terminology is a b*tch.
+
+
+// I think updating the GameState makes most sense inside GameManager..
+// GameManager.Instance.UpdateGameState(GameState.PlayLevel); 
+// Update GameState >> PlayLevel
 
 
 // Original version was just Instance = this;
