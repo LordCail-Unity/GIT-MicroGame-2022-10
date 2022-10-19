@@ -1,12 +1,21 @@
-// Based on Tarodev Game Manager tutorial
+// Heavily modified code based on Tarodev Game Manager tutorial
 // https://www.youtube.com/watch?v=4I0vonyqMi8
 //
-// See GameManager for additional notes.
+// Trialling new system using..
+// MetaManager for Start, Loading & EndGame
+// GameManager for StartLevel, PlayLevel, RestartLevel, CompleteLevel
+// 
+// Will also set up corresponding
+// MetaMenuManager | MetaMenuManagerUI
+// GameMenuManager | GameMenuManagerUI
+//
+// See MetaManager & GameManager for additional notes.
+//
 
 using System;
 using UnityEngine;
 
-public class MenuManager : MonoBehaviour
+public class GameMenuManager : MonoBehaviour
 {
 
     [SerializeField] private GameObject StartGameUI;
