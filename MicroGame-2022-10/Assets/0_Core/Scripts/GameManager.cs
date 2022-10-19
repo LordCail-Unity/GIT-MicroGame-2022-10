@@ -177,6 +177,16 @@ public enum GameState
 // Terminology is a b*tch.
 
 
+// StartCoroutine(Countdown());
+// structure based on.. Eric5h5 · Aug 02, 2013
+//
+// Modification supplied by Rambit · May 08, 2014
+// Just a quick note for other people using this solution:
+// yield return StartCoroutine(FinishFirst(5.0f));
+// I got an error when having new between return and StartCoroutine.
+// https://answers.unity.com/questions/228150/hold-or-wait-while-coroutine-finishes.html
+
+
 // I think updating the GameState makes most sense inside GameManager..
 // GameManager.Instance.UpdateGameState(GameState.PlayLevel); 
 // Update GameState >> PlayLevel
