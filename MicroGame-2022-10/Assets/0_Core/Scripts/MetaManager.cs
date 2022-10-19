@@ -18,6 +18,8 @@
 //
 // https://docs.unity3d.com/2020.3/Documentation/ScriptReference/Object.DontDestroyOnLoad.html
 //
+// METAMANAGER DONT DESTROY ON LOAD METHOD..
+//
 // Tarodev's SceneManager / LevelManager video will be the basis of our DontDestroyOnLoad code
 //
 // https://www.youtube.com/watch?v=OmobsXZSRKo
