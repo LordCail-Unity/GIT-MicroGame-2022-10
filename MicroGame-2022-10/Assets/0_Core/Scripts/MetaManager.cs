@@ -37,7 +37,10 @@ public class MetaManager : MonoBehaviour
 
     public static event Action<MetaState> OnMetaStateChanged;
 
-    private void Awake()
+    private int currentLevel;
+    private int levelToLoad;
+
+private void Awake()
     {
         if (Instance == null)
         {
@@ -53,10 +56,13 @@ public class MetaManager : MonoBehaviour
 
     private void Start()
     {
-        //MOVED FROM GAME MANAGER
-
-        // Set up Main Menu state
         UpdateMetaState(MetaState.StartGame);
+        UpdateCurrentLevelIndex();
+    }
+
+    private void UpdateCurrentLevelIndex()
+    {
+        currentLevel = SceneManager.GetActiveScene().buildIndex;
     }
 
     public void UpdateMetaState(MetaState newMetaState)
@@ -78,33 +84,40 @@ public class MetaManager : MonoBehaviour
         OnMetaStateChanged?.Invoke(newMetaState);
     }
 
-    private void HandleStartGame()
-    {
-        // Handled by MenuManager
-        // MenuManager subscribes to public static event OnGameStateChanged
-        // StartGame called from Play Button
-    }
-
     public void StartGame()
     {
         // Move StartGame code >> HandleStartGame..
+        // Handled by MenuManager
+        // MenuManager subscribes to public static event OnGameStateChanged
+        // StartGame called from Play Button
 
         // Move Loading actions to an Async LevelLoader script with a fake 1 second-ish loading screen 
         // Each LevelManager method can refer to the LevelLoader and feed in the level to load
         // Eg below = LevelLoader.LoadLevel(nextLevel)
 
         MetaManager.Instance.UpdateMetaState(MetaState.LoadLevel); // Update >> LoadLevel state
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        SceneManager.LoadScene(currentLevel + 1);
+    }
+
+
+    private void HandleStartGame()
+    {
     }
 
     private void HandleLoadLevel()
     {
+        //TEMP QUICK CODE TO CHECK FOR ENDGAME SCENE
+        //var currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        //    if (currentSceneIndex == SceneManager.sceneCountInBuildSettings)
+        //    {
+        //        MetaManager.Instance.UpdateMetaState(MetaState.EndGame);
+        //        Debug.Log("MetaState >> EndGame");
+        //    }
     }
 
     private void HandleEndGame()
     {
     }
-
 
     public void LoadMainMenu()
     {
@@ -114,26 +127,28 @@ public class MetaManager : MonoBehaviour
 
     public void ReloadThisLevel()
     {
-        // Eg below = LevelLoader.LoadLevel(thisLevel)
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); // OPTION: buildIndex, LoadSceneMode.Additive
+        Debug.Log("LevelManager.ReloadThisLevel");
+        LoadLevel(currentLevel); 
     }
 
     public void LoadNextLevel()
     {
         Debug.Log("LevelManager.LoadNextLevel");
-        
-        // Eg below = LevelLoader.LoadLevel(nextLevel)
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-
-        //TEMP QUICK CODE
-        var currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        if (currentSceneIndex == SceneManager.sceneCountInBuildSettings)
-        {
-            MetaManager.Instance.UpdateMetaState(MetaState.EndGame);
-            Debug.Log("MetaState >> EndGame");
-        }
-
+        levelToLoad = currentLevel + 1;
+        LoadLevel(levelToLoad);
     }
+
+    public void LoadLevel(int sceneIndex)
+    {
+        levelToLoad = sceneIndex;
+        SceneManager.LoadScene(levelToLoad); 
+        
+        // ADDITIVE LOADING OPTION:
+        // (levelToLoad, LoadSceneMode.Additive)
+    }
+
+
+
 
     public void QuitGame()
     {
