@@ -72,10 +72,10 @@ public class GameManager : MonoBehaviour
         yield return StartCoroutine(Wait(StartLevelDelay));
         // Feeding delay in seconds to Wait coroutine
 
+        UpdateGameState(GameState.PlayLevel);
+
         _playerController.enabled = true;
         Debug.Log("GameManager: PlayerController enabled");
-
-        UpdateGameState(GameState.PlayLevel);
     }
 
     IEnumerator Wait(int delaySecs)
@@ -86,6 +86,12 @@ public class GameManager : MonoBehaviour
         {
             yield return new WaitForSecondsRealtime(1);
             Debug.Log("Waited one second");
+            // Figure out how to feed this into the UI
+            // 3.. 2.. 1.. Go!
+            // Set to 1/3 of a second so the delay isn't too long?
+            //
+            // This logic could be adapted to a StartLevel tutorial
+            // eg Coroutine: Disable PlayerController | Show tutorial text Wait until key pressed
         }
 
         Debug.Log("GameManager: Waiting completed");
