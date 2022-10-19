@@ -22,7 +22,7 @@
 // Terminology is a b*tch.
 
 
-using System;
+using System; // Required for:  public static event Action<>
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -40,8 +40,10 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        //This will only work for the first level
-        UpdateGameState(GameState.StartGame);
+        //MOVED TO LEVEL MANAGER
+        //UpdateGameState(GameState.StartGame);
+
+        //In GameManager above would only have worked for the first level
         //Need to either eliminate this or figure out a way to use DontDestroyOnLoad
         //https://docs.unity3d.com/2020.3/Documentation/ScriptReference/Object.DontDestroyOnLoad.html
     }
@@ -52,12 +54,6 @@ public class GameManager : MonoBehaviour
 
         switch (newGameState)
         {
-            case GameState.StartGame:
-                HandleStartGame();
-                break;
-            case GameState.LoadLevel:
-                HandleLoadLevel();
-                break;
             case GameState.StartLevel:
                 HandleStartLevel();
                 break;
@@ -70,30 +66,18 @@ public class GameManager : MonoBehaviour
             case GameState.CompleteLevel:
                 HandleCompleteLevel();
                 break;
-            case GameState.EndGame:
-                HandleEndGame();
-                break;
         }
-
         OnGameStateChanged?.Invoke(newGameState);
-        // Tarodev explains why to use >> ?.Invoke <<
-        // It prevents an "unsubscribed error"
-        // Whatever that means (O_o)
     }
 
-    private void HandleStartGame()
-    {
-        // Handled by MenuManager
-        // MenuManager subscribes to public static event OnGameStateChanged
-        // StartGame called from Play Button
-    }
+    // In his video, Tarodev explains why to use >> ?.Invoke <<
+    // It prevents an "unsubscribed error"
+    // Whatever that means (O_o)
 
     private void HandleStartLevel()
     {
-    }
-
-    private void HandleLoadLevel()
-    {
+        // I think updating the GameState makes most sense inside GameManager..
+        // GameManager.Instance.UpdateGameState(GameState.PlayLevel); // Update GameState >> PlayLevel state
     }
 
     private void HandlePlayLevel()
@@ -108,9 +92,6 @@ public class GameManager : MonoBehaviour
     {
     }
 
-    private void HandleEndGame()
-    {
-    }
 }
 
 
@@ -120,11 +101,8 @@ public class GameManager : MonoBehaviour
 
 public enum GameState
 {
-    StartGame,
-    LoadLevel,
     StartLevel,
     PlayLevel,
     RestartLevel,
-    CompleteLevel,
-    EndGame
+    CompleteLevel
 }

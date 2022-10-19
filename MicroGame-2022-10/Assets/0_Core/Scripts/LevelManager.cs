@@ -12,24 +12,85 @@
 // 
 // The 1Ring could even instantiate all of the required systems in a linear fashion 
 // giving us full control over startup. 
+//
+// For now let's adapt Tarodev's GameManager code to suit our grand Meta scheming.
+// Need to figure out how to use DontDestroyOnLoad for 1RingManager (TEMP LevelManager)
+//
+// https://docs.unity3d.com/2020.3/Documentation/ScriptReference/Object.DontDestroyOnLoad.html
+// ..
 
+using System; // Required for:  public static event Action<>
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour
 {
-    
+
+    public static LevelManager Instance;
+    public MetaState _metaState;
+
+    public static event Action<MetaState> OnMetaStateChanged;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
+    private void Start()
+    {
+        //MOVED FROM GAME MANAGER
+
+        // Set up Main Menu state
+        UpdateMetaState(MetaState.StartGame);
+    }
+
+    public void UpdateMetaState(MetaState newMetaState)
+    {
+        _metaState = newMetaState;
+
+        switch (newMetaState)
+        {
+            case MetaState.StartGame:
+                HandleStartGame();
+                break;
+            case MetaState.LoadLevel:
+                HandleLoadLevel();
+                break;
+            case MetaState.EndGame:
+                HandleEndGame();
+                break;
+        }
+        OnMetaStateChanged?.Invoke(newMetaState);
+    }
+
+
+    private void HandleStartGame()
+    {
+        // Handled by MenuManager
+        // MenuManager subscribes to public static event OnGameStateChanged
+        // StartGame called from Play Button
+    }
+
     public void StartGame()
     {
+        // Move StartGame code >> HandleStartGame..
 
         // Move Loading actions to an Async LevelLoader script with a fake 1 second-ish loading screen 
         // Each LevelManager method can refer to the LevelLoader and feed in the level to load
         // Eg below = LevelLoader.LoadLevel(nextLevel)
 
-        GameManager.Instance.UpdateGameState(GameState.LoadLevel); // Update GameState >> LoadLevel state
+        LevelManager.Instance.UpdateMetaState(MetaState.LoadLevel); // Update >> LoadLevel state
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-        GameManager.Instance.UpdateGameState(GameState.PlayLevel); // Update GameState >> PlayLevel state
     }
+
+    private void HandleLoadLevel()
+    {
+    }
+
+    private void HandleEndGame()
+    {
+    }
+
 
     public void LoadMainMenu()
     {
@@ -54,10 +115,9 @@ public class LevelManager : MonoBehaviour
         var currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         if (currentSceneIndex == SceneManager.sceneCountInBuildSettings)
         {
-            GameManager.Instance.UpdateGameState(GameState.EndGame);
-            Debug.Log("GameState >> EndGame");
+            LevelManager.Instance.UpdateMetaState(MetaState.EndGame);
+            Debug.Log("MetaState >> EndGame");
         }
-        // Update GameState >> EndGame state
 
     }
 
@@ -67,4 +127,11 @@ public class LevelManager : MonoBehaviour
         Debug.Log("QUIT APPLICATION");
     }
 
+}
+
+    public enum MetaState
+{
+    StartGame,
+    LoadLevel,
+    EndGame
 }
