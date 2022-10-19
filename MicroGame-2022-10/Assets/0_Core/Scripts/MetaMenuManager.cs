@@ -15,41 +15,38 @@
 using System;
 using UnityEngine;
 
-public class GameMenuManager : MonoBehaviour
+public class MetaMenuManager : MonoBehaviour
 {
 
-    [SerializeField] private GameObject StartLevelUI;
-    [SerializeField] private GameObject PlayLevelUI;
-    [SerializeField] private GameObject RestartLevelUI;
-    [SerializeField] private GameObject CompleteLevelUI;
+    [SerializeField] private GameObject StartGameUI;
+    [SerializeField] private GameObject LoadingScreenUI;
+    [SerializeField] private GameObject EndGameUI;
 
     // OR one line option..
-    // [SerializeField] private GameObject StartLevelUI, PlayLevelUI, RestartLevelUI, CompleteLevelUI;
-
+    // [SerializeField] private GameObject StartGameUI, LoadingScreenUI, EndGameUI;
 
     private void Awake()
     {
-        GameManager.OnGameStateChanged += GameManager_OnGameStateChanged;
+        MetaManager.OnMetaStateChanged += MetaManager_OnMetaStateChanged;
         // Tarodev: >>  +=  <<   is how you subscribe to Events in C#
     }
 
     private void OnDestroy()
     {
-        GameManager.OnGameStateChanged -= GameManager_OnGameStateChanged;
+        MetaManager.OnMetaStateChanged -= MetaManager_OnMetaStateChanged;
         // Tarodev: >>   -=  << is how you unsubscribe from Events in C#
         // It's good practice to unsubscribe on destroy
     }
 
-    private void GameManager_OnGameStateChanged(GameState state)
+    private void MetaManager_OnMetaStateChanged(MetaState state)
     {
-        StartLevelUI.SetActive(state == GameState.StartLevel);
-        PlayLevelUI.SetActive(state == GameState.PlayLevel);
-        RestartLevelUI.SetActive(state == GameState.RestartLevel);
-        CompleteLevelUI.SetActive(state == GameState.CompleteLevel);
+        StartGameUI.SetActive(state == MetaState.StartGame);
+        LoadingScreenUI.SetActive(state == MetaState.LoadLevel);
+        EndGameUI.SetActive(state == MetaState.EndGame);
     }
 
     // SetActive requires a bool so above act like IF statements eg
-    // If state == GameState.StartGame
+    // If state == MetaState.StartGame
     // Set StartMenuUI to Active 
     // Else leave it inactive
 

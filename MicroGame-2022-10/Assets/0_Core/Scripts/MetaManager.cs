@@ -17,6 +17,10 @@
 // Need to figure out how to use DontDestroyOnLoad for 1RingManager (TEMP LevelManager)
 //
 // https://docs.unity3d.com/2020.3/Documentation/ScriptReference/Object.DontDestroyOnLoad.html
+//
+// Tarodev's SceneManager / LevelManager video will be the basis of our DontDestroyOnLoad code
+//
+// https://www.youtube.com/watch?v=OmobsXZSRKo
 // ..
 
 using System; // Required for..  public static event Action<>
@@ -33,7 +37,16 @@ public class MetaManager : MonoBehaviour
 
     private void Awake()
     {
-        Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+            // gameObject NOT GameObject as the latter will throw an error!!
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     private void Start()

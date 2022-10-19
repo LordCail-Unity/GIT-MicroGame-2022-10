@@ -35,7 +35,17 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        Instance = this;
+        // Original version was just Instance = this;
+        // Do we need this more comprehensive Awake code?
+
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     private void Start()
