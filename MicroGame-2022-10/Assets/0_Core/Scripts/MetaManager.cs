@@ -121,8 +121,8 @@ private void Awake()
 
     public void LoadMainMenu()
     {
-        // Eg below = LevelLoader.LoadLevel(mainMenuLevel)
-        SceneManager.LoadScene(0); // 0 = Build Index of Main Menu
+        LoadLevel(0); 
+        // Ensure MainMenu is at BuildIndex = 0 or change input
     }
 
     public void ReloadThisLevel()
@@ -146,9 +146,6 @@ private void Awake()
         // ADDITIVE LOADING OPTION:
         // (levelToLoad, LoadSceneMode.Additive)
     }
-
-
-
 
     public void QuitGame()
     {
