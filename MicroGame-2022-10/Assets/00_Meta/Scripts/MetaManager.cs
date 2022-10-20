@@ -17,7 +17,7 @@ public class MetaManager : MonoBehaviour
 
     public float loadingUIDelaySecs = 0.1f;
 
-    private int currentSceneIndex = 0;
+    private int currentSceneIndex = 0; // =0 is critical to reset between Playtest sessions
     private int sceneToLoad = 1;
     private int finalSceneIndex;
 
