@@ -1025,8 +1025,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 858710852433545211, guid: b19029643380a8441b81ee3e23b6e5e9, type: 3}
-        m_TargetAssemblyTypeName: LevelManager, Assembly-CSharp
-        m_MethodName: LoadNextLevel
+        m_TargetAssemblyTypeName: MetaManager, Assembly-CSharp
+        m_MethodName: LoadNextScene
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2625,7 +2625,7 @@ GameObject:
   - component: {fileID: 7460614311271398974}
   - component: {fileID: 2068391087}
   m_Layer: 5
-  m_Name: GameMenuManagerUI
+  m_Name: GameUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3064,8 +3064,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 858710852433545211, guid: b19029643380a8441b81ee3e23b6e5e9, type: 3}
-        m_TargetAssemblyTypeName: LevelManager, Assembly-CSharp
-        m_MethodName: ReloadThisLevel
+        m_TargetAssemblyTypeName: MetaManager, Assembly-CSharp
+        m_MethodName: LoadThisScene
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

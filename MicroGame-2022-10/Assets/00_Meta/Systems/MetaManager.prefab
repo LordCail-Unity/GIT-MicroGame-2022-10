@@ -43,3 +43,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: daab790429741bc45b413b2fd1062de2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _metaState: 0
+  mainMenuSceneIndex: 0
+  firstSceneIndex: 1
+  loadingUIDelaySecs: 0.1

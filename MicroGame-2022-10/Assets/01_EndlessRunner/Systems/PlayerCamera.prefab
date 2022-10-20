@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4455814980263091400}
   - component: {fileID: 6004064971632975708}
   m_Layer: 0
-  m_Name: MainCamera
+  m_Name: PlayerCamera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -98,8 +98,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   xOffset: 0
-  yOffset: 0
-  zOffset: 0
+  yOffset: 2
+  zOffset: -4
 --- !u!114 &6004064971632975708
 MonoBehaviour:
   m_ObjectHideFlags: 0

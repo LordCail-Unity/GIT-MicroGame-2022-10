@@ -1,4 +1,6 @@
 using System; // Required for..  public static event Action<>
+using System.Collections; // Required for IEnumerator Coroutines
+using System.Threading.Tasks; // Required for Task.Delay
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,8 +15,11 @@ public class MetaManager : MonoBehaviour
     public int mainMenuSceneIndex = 0; 
     public int firstSceneIndex = 1;
 
-    private int currentSceneIndex;
-    private int sceneToLoad;
+    public float loadingUIDelaySecs = 0.1f;
+
+    private int currentSceneIndex = 0;
+    private int sceneToLoad = 1;
+    private int finalSceneIndex;
 
     private void Awake()
     {
@@ -22,8 +27,6 @@ public class MetaManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            // "gameObject" NOT "GameObject" as the latter will throw an error!!
-            // Why dis? (O_o) 
         }
         else
         {
@@ -33,9 +36,11 @@ public class MetaManager : MonoBehaviour
 
     private void Start()
     {
-        UpdateMetaState(MetaState.InitializeApplication);
+        UpdateMetaState(MetaState.MainMenu);
+
         UpdateCurrentSceneIndex();
         sceneToLoad = firstSceneIndex;
+        finalSceneIndex = SceneManager.sceneCountInBuildSettings - 1; // BuildIndex starts at 0 so remove 1
     }
 
     private void UpdateCurrentSceneIndex()
@@ -49,8 +54,8 @@ public class MetaManager : MonoBehaviour
 
         switch (newMetaState)
         {
-            case MetaState.InitializeApplication:
-                HandleInitializeApplication(); // This is called at Start
+            case MetaState.MainMenu:
+                HandleMainMenu(); // This is called at Start
                 break;
             case MetaState.LoadScene:
                 HandleLoadScene();
@@ -65,10 +70,11 @@ public class MetaManager : MonoBehaviour
         OnMetaStateChanged?.Invoke(newMetaState);
     }
 
-    private void HandleInitializeApplication()
+    private void HandleMainMenu()
     {
-        // StartMenuUI activated automatically during this MetaState by MetaMenuManager
-        
+        Debug.Log("HandleMainMenu: MetaState = " + _metaState);
+        // MetaUI activated automatically during this MetaState by MetaMenuManager
+
         // Called automatically when game is initialized so we don't want to immediately LoadLevel
         // Could do things here like instantiating the Main Menu or other GameObjects in a specific order,
         // setting up audio managers, etc
@@ -76,18 +82,23 @@ public class MetaManager : MonoBehaviour
 
     private void HandleLoadScene()
     {
+        Debug.Log("HandleLoadScene: MetaState = " + _metaState);
+
         Debug.Log("HandleLoadScene: Current Scene = " + currentSceneIndex);
         Debug.Log("HandleLoadScene: SceneToLoad = " + sceneToLoad);
-        LoadScene(sceneToLoad);
+
+        LoadSceneAsync(sceneToLoad);
     }
 
     private void HandleGameManager()
     {
+        Debug.Log("HandleGameManager: MetaState = " + _metaState);
         Debug.Log("MetaManager: Hand over to GameManager");
     }
 
     private void HandleQuitApplication()
     {
+        Debug.Log("HandleQuitApplication: MetaState = " + _metaState);
         // Wrong order.. Need to..
         // Change the MetaState > MetaState.QuitApplication
         // That will display the Quit Screen
@@ -99,32 +110,45 @@ public class MetaManager : MonoBehaviour
 
     public void LoadMainMenuScene()
     {
-        Debug.Log("LevelManager.LoadMainMenuScene");
+        Debug.Log("MetaManager.LoadMainMenuScene");
         sceneToLoad = mainMenuSceneIndex;
         UpdateMetaState(MetaState.LoadScene);
     }
 
-    public void ReloadThisScene()
+    public void LoadThisScene()
     {
-        Debug.Log("LevelManager.ReloadThisScene");
+        Debug.Log("MetaManager.ReloadThisScene");
         sceneToLoad = currentSceneIndex;
         UpdateMetaState(MetaState.LoadScene);
     }
 
     public void LoadNextScene()
     {
-        Debug.Log("LevelManager.LoadNextLevel");
+        Debug.Log("MetaManager.LoadNextScene");
         sceneToLoad = currentSceneIndex + 1;
         UpdateMetaState(MetaState.LoadScene);
     }
 
-    public void LoadScene(int sceneIndex)
+    public async void LoadSceneAsync(int sceneIndex)
     {
-        
-        // Change to async loading method 
-        // Add a loading screen
-        SceneManager.LoadScene(sceneIndex);
+        Debug.Log("AsyncLoad: sceneIndex = " + sceneIndex);
+
+        var scene = SceneManager.LoadSceneAsync(sceneIndex);
+        scene.allowSceneActivation = false;
+
+        var progress = scene.progress;
+
+        do 
+        {
+            await Task.Delay(100);
+            Debug.Log("Waited 100");
+        } while (scene.progress < 0.9f);
+
+        scene.allowSceneActivation = true;
+        await Task.Delay(1);
+
         UpdateCurrentSceneIndex();
+        Debug.Log("AsyncLoad: New CurrentScene = " + currentSceneIndex);
         UpdateMetaState(MetaState.GameManager);
     }
 
@@ -137,7 +161,7 @@ public class MetaManager : MonoBehaviour
 
     public enum MetaState
 {
-    InitializeApplication,
+    MainMenu,
     LoadScene,
     GameManager,
     QuitApplication
@@ -148,11 +172,24 @@ public class MetaManager : MonoBehaviour
 // ==NOTES==
 
 
+// DontDestroyOnLoad(gameObject);
+// "gameObject" NOT "GameObject" as the latter will throw an error!!
+// Why dis? (O_o) 
+
+
 // HandleInitializeGame()
 // Called automatically when game is initialized so we don't want to immediately LoadLevel
 // Could do things here like instantiating the Main Menu or other GameObjects in a specific order,
 // setting up audio managers, etc
 
+
+// BASIC LOADING OPTION
+// public void LoadScene(int sceneIndex)
+// { SceneManager.LoadScene(sceneIndex); }
+// Need to wait AT LEAST one frame after loading to set active scene
+// OR call SetActiveScene to be explicit..
+// In the end we just went with Tarodev's loading script
+// https://www.youtube.com/watch?v=OmobsXZSRKo&t=32s
 
 // ASYNC LOADING OPTION:
 // Create Async LevelLoader script with a fake 1 second-ish loading screen 
@@ -166,8 +203,7 @@ public class MetaManager : MonoBehaviour
 //TEMP QUICK CODE TO CHECK FOR ENDGAME SCENE
 // Do we need this any more?
 // Update to EndGame state
-//var currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-//    if (currentSceneIndex == SceneManager.sceneCountInBuildSettings)
+//    if (currentSceneIndex == finalSceneIndex)
 //    {
 //        MetaManager.Instance.UpdateMetaState(MetaState.EndGame);
 //        Debug.Log("MetaState >> EndGame");
@@ -190,8 +226,8 @@ public class MetaManager : MonoBehaviour
 //
 // How to deal with Start & End scenes?
 //
-// One thing we could do is to set up LevelManager "above" GameManager
-// This would make sense as the LevelManager is looking after Scenes
+// One thing we could do is to set up MetaManager "above" GameManager
+// This would make sense as the MetaManager is looking after Scenes
 // including the Start and EndGame scenes (it should be called SceneManager
 // but this would clash with the Unity class of the same name).
 // 
@@ -202,13 +238,13 @@ public class MetaManager : MonoBehaviour
 // giving us full control over startup. 
 //
 // For now let's adapt Tarodev's GameManager code to suit our grand Meta scheming.
-// Need to figure out how to use DontDestroyOnLoad for 1RingManager (TEMP LevelManager)
+// Need to figure out how to use DontDestroyOnLoad for 1RingManager (TEMP MetaManager)
 //
 // https://docs.unity3d.com/2020.3/Documentation/ScriptReference/Object.DontDestroyOnLoad.html
 //
 // METAMANAGER DONT DESTROY ON LOAD METHOD..
 //
-// Tarodev's SceneManager / LevelManager video will be the basis of our DontDestroyOnLoad code
+// Tarodev's SceneManager / MetaManager video will be the basis of our DontDestroyOnLoad code
 //
 // https://www.youtube.com/watch?v=OmobsXZSRKo
 // ..

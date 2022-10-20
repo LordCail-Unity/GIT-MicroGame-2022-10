@@ -14,23 +14,27 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+        Debug.Log("GameManager Awake()");
+
         if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        { Instance = this; }
+        else { Destroy(gameObject); }
+
+        UpdateGameState(GameState.LoadingIn);
+        Debug.Log("GameManager: GameState = " + _gameState);
     }
 
     private void Start()
-    {
+    {    
+        Debug.Log("GameManager Start()");
         _playerController = FindObjectOfType<PlayerController>();
 
         if (_playerController == null)
         { Debug.Log("GameManager: Can't find PlayerController"); }
         else { Debug.Log("GameManager: PlayerController locked and loaded"); }
+
+        DisablePlayerMovement();
+        Debug.Log("GameManager: PlayerController disabled");
 
         UpdateGameState(GameState.StartLevel);
     }
@@ -40,15 +44,14 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Debug.Log("Escape key was pressed");
+
             if (_gameState == GameState.PlayLevel)
-            //What about ESC during Restart or Complete Level?
-            {
-                UpdateGameState(GameState.PauseLevel);
-            }
-            else
-            {
-                UpdateGameState(GameState.PlayLevel);
-            }
+            { UpdateGameState(GameState.PauseLevel); }
+            else { UpdateGameState(GameState.PlayLevel); }
+
+            // TO DO
+            // What about ESC during Restart or Complete Level?
+
         }
     }
 
@@ -58,6 +61,9 @@ public class GameManager : MonoBehaviour
 
         switch (newGameState)
         {
+            case GameState.LoadingIn:
+                HandleLoadingIn();
+                break;
             case GameState.StartLevel:
                 HandleStartLevel();
                 break;
@@ -77,6 +83,12 @@ public class GameManager : MonoBehaviour
         OnGameStateChanged?.Invoke(newGameState);
     }
 
+    private void HandleLoadingIn()
+    {
+        // Wait for MetaManager to finish loading processes
+        // MetaManager will then trigger StartLevel
+    }
+
     private void HandleStartLevel()
     {
         StartCoroutine(Countdown());
@@ -84,19 +96,26 @@ public class GameManager : MonoBehaviour
 
     private void HandlePlayLevel()
     {
+        EnablePlayerMovement();
+
+        // TO DO
         // In case we are coming out of Pause menu..
         // Set Time.deltaTime = 1f;
-        EnablePlayerMovement();
     }
 
     private void HandlePauseLevel()
     {
-        // Set Time.deltaTime = 0f;
         DisablePlayerMovement();
+
+        // TO DO
+        // Set Time.deltaTime = 0f;
     }
 
     private void HandleRestartLevel()
     {
+        DisablePlayerMovement();
+
+        // TO DO
         // On Restart Level activated:
         // --PLAYER CTRL-- Disable player controller
         // --MENU MGR-- Pause before activating RESTART screen
@@ -105,14 +124,13 @@ public class GameManager : MonoBehaviour
         // (1) Retry (eg to beat high score) OR
         // (2) Main Menu
         // Hand back to MetaManager to destroy this level / scene
-
-        DisablePlayerMovement();
-        // GameManager can disable PlayerController 
-
     }
 
     private void HandleCompleteLevel()
     {
+        DisablePlayerMovement();
+
+        // TO DO
         // On Complete Level activated:
         // --PLAYER CTRL-- Disable player controller
         // --MENU MGR-- Pause before activating WIN screen
@@ -122,10 +140,6 @@ public class GameManager : MonoBehaviour
         // (2) Retry (eg to beat high score) OR
         // (3) Main Menu
         // Hand back to MetaManager to destroy this level / scene
-
-        DisablePlayerMovement();
-        // PlayerController can't disable itself but GameManager can 
-
     }
 
     private void DisablePlayerMovement()
@@ -140,9 +154,6 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator Countdown()
     {
-        DisablePlayerMovement();
-        Debug.Log("GameManager: PlayerController disabled");
-
         int StartLevelDelay = 3;
         // Hardcoded delay in seconds
         yield return StartCoroutine(Wait(StartLevelDelay));
@@ -180,6 +191,7 @@ public class GameManager : MonoBehaviour
 
 public enum GameState
 {
+    LoadingIn,
     StartLevel,
     PlayLevel,
     PauseLevel,
@@ -228,6 +240,9 @@ public enum GameState
 // I think updating the GameState makes most sense inside GameManager..
 // GameManager.Instance.UpdateGameState(GameState.PlayLevel); 
 // Update GameState >> PlayLevel
+
+
+// PlayerController can't disable itself but GameManager can 
 
 
 // Original version was just Instance = this;

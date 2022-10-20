@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class GameMenuManager : MonoBehaviour
+public class GameUI : MonoBehaviour
 {
 
     [SerializeField] private GameObject StartLevelUI;

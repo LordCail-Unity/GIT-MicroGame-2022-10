@@ -1,10 +1,10 @@
 using System;
 using UnityEngine;
 
-public class MetaMenuUI : MonoBehaviour
+public class MetaUI : MonoBehaviour
 {
 
-    public static MetaMenuUI Instance;
+    public static MetaUI Instance;
 
     [SerializeField] private GameObject MainMenuUI;
     [SerializeField] private GameObject LoadingScreenUI;
@@ -32,9 +32,7 @@ public class MetaMenuUI : MonoBehaviour
 
     private void MetaManager_OnMetaStateChanged(MetaState state)
     {
-        // Each UI will only be SetActive IF current MetaState == MetaState.XYZ
-
-        MainMenuUI.SetActive(state == MetaState.InitializeApplication);
+        MainMenuUI.SetActive(state == MetaState.MainMenu);
         LoadingScreenUI.SetActive(state == MetaState.LoadScene);
         QuitApplicationUI.SetActive(state == MetaState.QuitApplication);
     }
@@ -43,6 +41,8 @@ public class MetaMenuUI : MonoBehaviour
 
 
 // ==NOTES==
+//
+// Each UI will only be SetActive IF current MetaState == MetaState.XYZ
 //
 // Heavily modified code based on Tarodev Game Manager tutorial
 // https://www.youtube.com/watch?v=4I0vonyqMi8
