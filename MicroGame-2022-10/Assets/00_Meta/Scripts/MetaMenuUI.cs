@@ -1,10 +1,10 @@
 using System;
 using UnityEngine;
 
-public class MetaMenuManager : MonoBehaviour
+public class MetaMenuUI : MonoBehaviour
 {
 
-    public static MetaMenuManager Instance;
+    public static MetaMenuUI Instance;
 
     [SerializeField] private GameObject MainMenuUI;
     [SerializeField] private GameObject LoadingScreenUI;
