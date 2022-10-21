@@ -20,13 +20,12 @@ public class GameManager : MonoBehaviour
         { Instance = this; }
         else { Destroy(gameObject); }
 
-        UpdateGameState(GameState.LoadingIn);
+        UpdateGameState(GameState.SetupLevel);
         Debug.Log("GameManager: GameState = " + _gameState);
     }
 
     private void Start()
-    {    
-        Debug.Log("GameManager Start()");
+    {
         _playerController = FindObjectOfType<PlayerController>();
 
         if (_playerController == null)
@@ -37,6 +36,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("GameManager: PlayerController disabled");
 
         UpdateGameState(GameState.StartLevel);
+        Debug.Log("GameManager: GameState = " + _gameState);
     }
 
     private void Update()
@@ -61,8 +61,8 @@ public class GameManager : MonoBehaviour
 
         switch (newGameState)
         {
-            case GameState.LoadingIn:
-                HandleLoadingIn();
+            case GameState.SetupLevel:
+                HandleSetupLevel();
                 break;
             case GameState.StartLevel:
                 HandleStartLevel();
@@ -83,7 +83,7 @@ public class GameManager : MonoBehaviour
         OnGameStateChanged?.Invoke(newGameState);
     }
 
-    private void HandleLoadingIn()
+    private void HandleSetupLevel()
     {
         // Wait for MetaManager to finish loading processes
         // MetaManager will then trigger StartLevel
@@ -191,12 +191,12 @@ public class GameManager : MonoBehaviour
 
 public enum GameState
 {
-    LoadingIn,
-    StartLevel,
-    PlayLevel,
-    PauseLevel,
-    RestartLevel,
-    CompleteLevel
+    SetupLevel = 1,
+    StartLevel = 2,
+    PlayLevel = 3,
+    PauseLevel = 4,
+    RestartLevel = 5,
+    CompleteLevel = 6
 }
 
 

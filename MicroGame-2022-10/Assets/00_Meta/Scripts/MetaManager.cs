@@ -1,5 +1,5 @@
 using System; // Required for..  public static event Action<>
-using System.Collections; // Required for IEnumerator Coroutines but not currently using
+// using System.Collections; // Required for IEnumerator Coroutines but not currently using
 using System.Threading.Tasks; // Required for Task.Delay
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -20,8 +20,6 @@ public class MetaManager : MonoBehaviour
     private int currentSceneIndex = 0;
     private int sceneToLoad = 1;
     private int finalSceneIndex;
-    // Using these variables directly means they do NOT reset between Playtest sessions
-    // Try using Instance.currentSceneIndex in the code body
 
     private void Awake()
     {
@@ -36,29 +34,23 @@ public class MetaManager : MonoBehaviour
         }
 
         UpdateMetaState(MetaState.SetupApp);
-        Debug.Log("MetaMgr Awake: MetaState = " + _metaState);
     }
 
     private void Start()
     {
         UpdateMetaState(MetaState.MainMenu);
-        Debug.Log("MetaMgr Start: MetaState = " + _metaState);
 
         UpdateCurrentSceneIndex();
         Instance.sceneToLoad = firstSceneIndex;
         Debug.Log("MetaMgr Start: sceneToLoad = " + Instance.sceneToLoad);
 
         Instance.finalSceneIndex = SceneManager.sceneCountInBuildSettings - 1;
-        Debug.Log("MetaMgr Start: MetaState = " + Instance.finalSceneIndex);
-
-        // BuildIndex starts at 0 so remove 1
-        // Try "Instance.variable" as the variables don't seem to be resetting between Playtests
+        Debug.Log("MetaMgr Start: finalSceneIndex = " + Instance.finalSceneIndex);
     }
 
     private void UpdateCurrentSceneIndex()
     {
         Instance.currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        // Try "Instance.variable" as the variables don't seem to be resetting between Playtests
     }
 
     public void UpdateMetaState(MetaState newMetaState)
@@ -71,7 +63,7 @@ public class MetaManager : MonoBehaviour
                 HandleSetupApp();
                 break;
             case MetaState.MainMenu:
-                HandleMainMenu(); // This is called at Start
+                HandleMainMenu(); 
                 break;
             case MetaState.LoadScene:
                 HandleLoadScene();
@@ -93,16 +85,12 @@ public class MetaManager : MonoBehaviour
 
     private void HandleSetupApp()
     {
+        Debug.Log("HandleSetupApp: MetaState = " + _metaState);
     }
 
     private void HandleMainMenu()
     {
         Debug.Log("HandleMainMenu: MetaState = " + _metaState);
-        // MetaUI activated automatically during this MetaState by MetaMenuManager
-
-        // Called automatically when game is initialized so we don't want to immediately LoadLevel
-        // Could do things here like instantiating the Main Menu or other GameObjects in a specific order,
-        // setting up audio managers, etc
     }
 
     private void HandleLoadScene()
@@ -123,6 +111,8 @@ public class MetaManager : MonoBehaviour
 
     private void HandleQuitMenu()
     {
+        Debug.Log("HandleQuitMenu: MetaState = " + _metaState);
+
     }
 
     private void HandleQuitApplication()
@@ -135,7 +125,7 @@ public class MetaManager : MonoBehaviour
     public void LoadMainMenuScene()
     {
         Debug.Log("MetaManager.LoadMainMenuScene");
-        Instance.sceneToLoad = mainMenuSceneIndex;
+        Instance.sceneToLoad = Instance.mainMenuSceneIndex;
         UpdateMetaState(MetaState.LoadScene);
     }
 
@@ -162,19 +152,26 @@ public class MetaManager : MonoBehaviour
 
         var progress = scene.progress;
 
+        // Can we change this to an Operation style method 
+        // like the one we used in the Brackeys Loading tutorial?
+        // Effect is the same but it feels cleaner
+
         do 
         {
             await Task.Delay(1000);
             Debug.Log("Waited 100");
-        } while (scene.progress < 0.9f);
+        } 
+        while (scene.progress < 0.9f);
 
         scene.allowSceneActivation = true;
-        await Task.Delay(1); // Delay to allow SceneActivation to kick in next frame
+        await Task.Delay(1); 
+        // Delay to allow SceneActivation to kick in before moving to next action
 
         UpdateCurrentSceneIndex();
-        Debug.Log("AsyncLoad: New CurrentScene = " + Instance.currentSceneIndex);
+        Debug.Log("AsyncLoad: New currentSceneIndex = " + Instance.currentSceneIndex);
+        Debug.Log("AsyncLoad: finalSceneIndex = " + Instance.finalSceneIndex);
 
-        if(Instance.currentSceneIndex == Instance.finalSceneIndex)
+        if (Instance.currentSceneIndex == Instance.finalSceneIndex)
         {
             UpdateMetaState(MetaState.QuitMenu);
         }
@@ -193,18 +190,41 @@ public class MetaManager : MonoBehaviour
 
 public enum MetaState
 {
-    SetupApp,
-    MainMenu,
-    LoadScene,
-    GameManager,
-    QuitMenu,
-    QuitApp
+    SetupApp = 1,
+    MainMenu = 2,
+    LoadScene = 3,
+    GameManager = 4,
+    QuitMenu = 5,
+    QuitApp = 6
 }
 
 
 
 // ==NOTES==
 
+
+// Variables do NOT reset between Playtest sessions
+// Try using Instance.currentSceneIndex in the code body
+// This seems to have fixed it
+
+
+// Debug.Log("MetaMgr Start: MetaState = " + _metaState); 
+// Why is this debug log coming out as an integer? 
+// And not the right integer for the Enum type..
+// But only if you pause the playtest before pressing the Start button (O_o)
+
+
+// HandleMainMenu
+// MetaUI activated automatically during this MetaState by MetaMenuManager
+// Called automatically when game is initialized so we don't want to immediately LoadLevel
+// Could do things here like instantiating the Main Menu or other GameObjects in a specific order,
+// setting up audio managers, etc
+
+
+
+// FinalSceneIndex
+// BuildIndex starts at 0 so remove 1
+// Try "Instance.variable" as the variables don't seem to be resetting between Playtests
 
 // DontDestroyOnLoad(gameObject);
 // "gameObject" NOT "GameObject" as the latter will throw an error!!
@@ -258,6 +278,9 @@ public enum MetaState
 
 // Updating MetaState >> QuitApplication should automatically trigger
 // HandleLoadScene();
+
+// Get Enum member from int
+// https://answers.unity.com/questions/447240/get-enum-member-from-int.html
 
 
 // We have GameManager to handle transitions in a single game level. See GameManager notes.
