@@ -34,7 +34,7 @@ RectTransform:
   - {fileID: 9061592370934539157}
   - {fileID: 3586450570385698157}
   - {fileID: 5493338436700510399}
-  - {fileID: 4282304620628718437}
+  - {fileID: 1774218436963446273}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -118,7 +118,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MainMenuUI: {fileID: 8961275293471730974}
   LoadingScreenUI: {fileID: 3069338556853033611}
-  QuitApplicationUI: {fileID: 7871522150177474189}
+  QuitMenuUI: {fileID: 5678973886595832809}
 --- !u!1001 &258516832690082721
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -230,21 +230,13 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 5740450722319371038, guid: 1ce985a6d7fcba54fa222051e32e63c9, type: 3}
   m_PrefabInstance: {fileID: 258516832690082721}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &1659333300311608916
+--- !u!1001 &3816138511182844720
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 7460614311271398963}
     m_Modifications:
-    - target: {fileID: 822998449275921892, guid: 2bfc8485d8130344990722796059875a, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 858710852433545211, guid: b19029643380a8441b81ee3e23b6e5e9, type: 3}
-    - target: {fileID: 822998449275921892, guid: 2bfc8485d8130344990722796059875a, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: MetaManager, Assembly-CSharp
-      objectReference: {fileID: 0}
     - target: {fileID: 3200633841817124145, guid: 2bfc8485d8130344990722796059875a, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -331,7 +323,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8807459123198052569, guid: 2bfc8485d8130344990722796059875a, type: 3}
       propertyPath: m_Name
-      value: QuitApplicationUI
+      value: QuitMenuUI
       objectReference: {fileID: 0}
     - target: {fileID: 8807459123198052569, guid: 2bfc8485d8130344990722796059875a, type: 3}
       propertyPath: m_IsActive
@@ -339,15 +331,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2bfc8485d8130344990722796059875a, type: 3}
---- !u!1 &7871522150177474189 stripped
+--- !u!1 &5678973886595832809 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8807459123198052569, guid: 2bfc8485d8130344990722796059875a, type: 3}
-  m_PrefabInstance: {fileID: 1659333300311608916}
+  m_PrefabInstance: {fileID: 3816138511182844720}
   m_PrefabAsset: {fileID: 0}
---- !u!224 &4282304620628718437 stripped
+--- !u!224 &1774218436963446273 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3200633841817124145, guid: 2bfc8485d8130344990722796059875a, type: 3}
-  m_PrefabInstance: {fileID: 1659333300311608916}
+  m_PrefabInstance: {fileID: 3816138511182844720}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4692208432256663413
 PrefabInstance:

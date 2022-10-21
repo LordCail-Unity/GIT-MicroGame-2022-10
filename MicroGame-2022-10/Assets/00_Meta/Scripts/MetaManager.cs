@@ -1,5 +1,5 @@
 using System; // Required for..  public static event Action<>
-using System.Collections; // Required for IEnumerator Coroutines
+using System.Collections; // Required for IEnumerator Coroutines but not currently using
 using System.Threading.Tasks; // Required for Task.Delay
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -17,9 +17,11 @@ public class MetaManager : MonoBehaviour
 
     public float loadingUIDelaySecs = 0.1f;
 
-    private int currentSceneIndex = 0; // =0 is critical to reset between Playtest sessions
+    private int currentSceneIndex = 0;
     private int sceneToLoad = 1;
     private int finalSceneIndex;
+    // Using these variables directly means they do NOT reset between Playtest sessions
+    // Try using Instance.currentSceneIndex in the code body
 
     private void Awake()
     {
@@ -32,20 +34,31 @@ public class MetaManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        UpdateMetaState(MetaState.SetupApp);
+        Debug.Log("MetaMgr Awake: MetaState = " + _metaState);
     }
 
     private void Start()
     {
         UpdateMetaState(MetaState.MainMenu);
+        Debug.Log("MetaMgr Start: MetaState = " + _metaState);
 
         UpdateCurrentSceneIndex();
-        sceneToLoad = firstSceneIndex;
-        finalSceneIndex = SceneManager.sceneCountInBuildSettings - 1; // BuildIndex starts at 0 so remove 1
+        Instance.sceneToLoad = firstSceneIndex;
+        Debug.Log("MetaMgr Start: sceneToLoad = " + Instance.sceneToLoad);
+
+        Instance.finalSceneIndex = SceneManager.sceneCountInBuildSettings - 1;
+        Debug.Log("MetaMgr Start: MetaState = " + Instance.finalSceneIndex);
+
+        // BuildIndex starts at 0 so remove 1
+        // Try "Instance.variable" as the variables don't seem to be resetting between Playtests
     }
 
     private void UpdateCurrentSceneIndex()
     {
-        currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        Instance.currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        // Try "Instance.variable" as the variables don't seem to be resetting between Playtests
     }
 
     public void UpdateMetaState(MetaState newMetaState)
@@ -54,6 +67,9 @@ public class MetaManager : MonoBehaviour
 
         switch (newMetaState)
         {
+            case MetaState.SetupApp:
+                HandleSetupApp();
+                break;
             case MetaState.MainMenu:
                 HandleMainMenu(); // This is called at Start
                 break;
@@ -63,11 +79,20 @@ public class MetaManager : MonoBehaviour
             case MetaState.GameManager:
                 HandleGameManager();
                 break;
-            case MetaState.QuitApplication:
+            case MetaState.QuitMenu:
+                HandleQuitMenu();
+                break;
+            case MetaState.QuitApp:
                 HandleQuitApplication();
+                break;
+            default:
                 break;
         }
         OnMetaStateChanged?.Invoke(newMetaState);
+    }
+
+    private void HandleSetupApp()
+    {
     }
 
     private void HandleMainMenu()
@@ -84,10 +109,10 @@ public class MetaManager : MonoBehaviour
     {
         Debug.Log("HandleLoadScene: MetaState = " + _metaState);
 
-        Debug.Log("HandleLoadScene: Current Scene = " + currentSceneIndex);
-        Debug.Log("HandleLoadScene: SceneToLoad = " + sceneToLoad);
+        Debug.Log("HandleLoadScene: Current Scene = " + Instance.currentSceneIndex);
+        Debug.Log("HandleLoadScene: SceneToLoad = " + Instance.sceneToLoad);
 
-        LoadSceneAsync(sceneToLoad);
+        LoadSceneAsync(Instance.sceneToLoad);
     }
 
     private void HandleGameManager()
@@ -96,14 +121,13 @@ public class MetaManager : MonoBehaviour
         Debug.Log("MetaManager: Hand over to GameManager");
     }
 
+    private void HandleQuitMenu()
+    {
+    }
+
     private void HandleQuitApplication()
     {
         Debug.Log("HandleQuitApplication: MetaState = " + _metaState);
-        // Wrong order.. Need to..
-        // Change the MetaState > MetaState.QuitApplication
-        // That will display the Quit Screen
-        // On button press do Quit Application
-
         Application.Quit();
         Debug.Log("QUIT APPLICATION");
     }
@@ -111,21 +135,21 @@ public class MetaManager : MonoBehaviour
     public void LoadMainMenuScene()
     {
         Debug.Log("MetaManager.LoadMainMenuScene");
-        sceneToLoad = mainMenuSceneIndex;
+        Instance.sceneToLoad = mainMenuSceneIndex;
         UpdateMetaState(MetaState.LoadScene);
     }
 
     public void LoadThisScene()
     {
         Debug.Log("MetaManager.ReloadThisScene");
-        sceneToLoad = currentSceneIndex;
+        Instance.sceneToLoad = Instance.currentSceneIndex;
         UpdateMetaState(MetaState.LoadScene);
     }
 
     public void LoadNextScene()
     {
         Debug.Log("MetaManager.LoadNextScene");
-        sceneToLoad = currentSceneIndex + 1;
+        Instance.sceneToLoad = Instance.currentSceneIndex + 1;
         UpdateMetaState(MetaState.LoadScene);
     }
 
@@ -145,26 +169,36 @@ public class MetaManager : MonoBehaviour
         } while (scene.progress < 0.9f);
 
         scene.allowSceneActivation = true;
-        await Task.Delay(1);
+        await Task.Delay(1); // Delay to allow SceneActivation to kick in next frame
 
         UpdateCurrentSceneIndex();
-        Debug.Log("AsyncLoad: New CurrentScene = " + currentSceneIndex);
-        UpdateMetaState(MetaState.GameManager);
+        Debug.Log("AsyncLoad: New CurrentScene = " + Instance.currentSceneIndex);
+
+        if(Instance.currentSceneIndex == Instance.finalSceneIndex)
+        {
+            UpdateMetaState(MetaState.QuitMenu);
+        }
+        else
+        {
+            UpdateMetaState(MetaState.GameManager);
+        }
     }
 
-    public void QuitGame()
+    public void QuitApp()
     {
-        UpdateMetaState(MetaState.QuitApplication);
+        UpdateMetaState(MetaState.QuitApp);
     }
 
 }
 
-    public enum MetaState
+public enum MetaState
 {
+    SetupApp,
     MainMenu,
     LoadScene,
     GameManager,
-    QuitApplication
+    QuitMenu,
+    QuitApp
 }
 
 
@@ -208,6 +242,14 @@ public class MetaManager : MonoBehaviour
 //        MetaManager.Instance.UpdateMetaState(MetaState.EndGame);
 //        Debug.Log("MetaState >> EndGame");
 //    }
+
+
+// HandleQuitApp
+// Initially had wrong order.. Needed to..
+// Change the MetaState > MetaState.QuitMenu
+// That will display the Quit Menu
+// On button press change to MetaState QuitApp
+// That triggers Quit Application
 
 
 // Updating MetaState >> LoadScene should automatically trigger

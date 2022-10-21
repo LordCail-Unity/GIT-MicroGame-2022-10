@@ -8,7 +8,7 @@ public class MetaUI : MonoBehaviour
 
     [SerializeField] private GameObject MainMenuUI;
     [SerializeField] private GameObject LoadingScreenUI;
-    [SerializeField] private GameObject QuitApplicationUI;
+    [SerializeField] private GameObject QuitMenuUI;
 
     private void Awake()
     {
@@ -34,7 +34,7 @@ public class MetaUI : MonoBehaviour
     {
         MainMenuUI.SetActive(state == MetaState.MainMenu);
         LoadingScreenUI.SetActive(state == MetaState.LoadScene);
-        QuitApplicationUI.SetActive(state == MetaState.QuitApplication);
+        QuitMenuUI.SetActive(state == MetaState.QuitMenu);
     }
 
 }
