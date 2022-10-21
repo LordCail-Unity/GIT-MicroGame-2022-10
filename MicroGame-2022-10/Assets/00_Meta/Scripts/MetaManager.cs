@@ -1,6 +1,5 @@
 using System; // Required for..  public static event Action<>
-using System.Collections; // Required for IEnumerator Coroutines
-using System.Threading.Tasks; // Required for Task.Delay
+// using System.Collections; // Required for IEnumerator Coroutines but not currently using
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -16,10 +15,10 @@ public class MetaManager : MonoBehaviour
     public int firstSceneIndex = 1;
 
     public float loadingUIDelaySecs = 0.1f;
-
-    private int currentSceneIndex = 0;
-    private int sceneToLoad = 1;
-    private int finalSceneIndex;
+    
+    [HideInInspector] public int currentSceneIndex = 0;
+    [HideInInspector] public int finalSceneIndex;
+    [HideInInspector] public int sceneToLoad = 1;
 
     private void Awake()
     {
@@ -32,6 +31,8 @@ public class MetaManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        UpdateMetaState(MetaState.SetupApp);
     }
 
     private void Start()
@@ -39,13 +40,16 @@ public class MetaManager : MonoBehaviour
         UpdateMetaState(MetaState.MainMenu);
 
         UpdateCurrentSceneIndex();
-        sceneToLoad = firstSceneIndex;
-        finalSceneIndex = SceneManager.sceneCountInBuildSettings - 1; // BuildIndex starts at 0 so remove 1
+        Instance.sceneToLoad = firstSceneIndex;
+        Debug.Log("MetaMgr Start: sceneToLoad = " + Instance.sceneToLoad);
+
+        Instance.finalSceneIndex = SceneManager.sceneCountInBuildSettings - 1;
+        Debug.Log("MetaMgr Start: finalSceneIndex = " + Instance.finalSceneIndex);
     }
 
-    private void UpdateCurrentSceneIndex()
+    public void UpdateCurrentSceneIndex()
     {
-        currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        Instance.currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
     }
 
     public void UpdateMetaState(MetaState newMetaState)
@@ -54,8 +58,11 @@ public class MetaManager : MonoBehaviour
 
         switch (newMetaState)
         {
+            case MetaState.SetupApp:
+                HandleSetupApp();
+                break;
             case MetaState.MainMenu:
-                HandleMainMenu(); // This is called at Start
+                HandleMainMenu(); 
                 break;
             case MetaState.LoadScene:
                 HandleLoadScene();
@@ -63,31 +70,34 @@ public class MetaManager : MonoBehaviour
             case MetaState.GameManager:
                 HandleGameManager();
                 break;
-            case MetaState.QuitApplication:
+            case MetaState.QuitMenu:
+                HandleQuitMenu();
+                break;
+            case MetaState.QuitApp:
                 HandleQuitApplication();
+                break;
+            default:
                 break;
         }
         OnMetaStateChanged?.Invoke(newMetaState);
     }
 
+    private void HandleSetupApp()
+    {
+        Debug.Log("HandleSetupApp: MetaState = " + _metaState);
+    }
+
     private void HandleMainMenu()
     {
         Debug.Log("HandleMainMenu: MetaState = " + _metaState);
-        // MetaUI activated automatically during this MetaState by MetaMenuManager
-
-        // Called automatically when game is initialized so we don't want to immediately LoadLevel
-        // Could do things here like instantiating the Main Menu or other GameObjects in a specific order,
-        // setting up audio managers, etc
     }
 
     private void HandleLoadScene()
     {
         Debug.Log("HandleLoadScene: MetaState = " + _metaState);
 
-        Debug.Log("HandleLoadScene: Current Scene = " + currentSceneIndex);
-        Debug.Log("HandleLoadScene: SceneToLoad = " + sceneToLoad);
-
-        LoadSceneAsync(sceneToLoad);
+        Debug.Log("HandleLoadScene: Current Scene = " + Instance.currentSceneIndex);
+        Debug.Log("HandleLoadScene: SceneToLoad = " + Instance.sceneToLoad);
     }
 
     private void HandleGameManager()
@@ -96,14 +106,15 @@ public class MetaManager : MonoBehaviour
         Debug.Log("MetaManager: Hand over to GameManager");
     }
 
+    private void HandleQuitMenu()
+    {
+        Debug.Log("HandleQuitMenu: MetaState = " + _metaState);
+
+    }
+
     private void HandleQuitApplication()
     {
         Debug.Log("HandleQuitApplication: MetaState = " + _metaState);
-        // Wrong order.. Need to..
-        // Change the MetaState > MetaState.QuitApplication
-        // That will display the Quit Screen
-        // On button press do Quit Application
-
         Application.Quit();
         Debug.Log("QUIT APPLICATION");
     }
@@ -111,66 +122,69 @@ public class MetaManager : MonoBehaviour
     public void LoadMainMenuScene()
     {
         Debug.Log("MetaManager.LoadMainMenuScene");
-        sceneToLoad = mainMenuSceneIndex;
+        Instance.sceneToLoad = Instance.mainMenuSceneIndex;
         UpdateMetaState(MetaState.LoadScene);
     }
 
     public void LoadThisScene()
     {
         Debug.Log("MetaManager.ReloadThisScene");
-        sceneToLoad = currentSceneIndex;
+        Instance.sceneToLoad = Instance.currentSceneIndex;
         UpdateMetaState(MetaState.LoadScene);
     }
 
     public void LoadNextScene()
     {
         Debug.Log("MetaManager.LoadNextScene");
-        sceneToLoad = currentSceneIndex + 1;
+        Instance.sceneToLoad = Instance.currentSceneIndex + 1;
         UpdateMetaState(MetaState.LoadScene);
     }
 
-    public async void LoadSceneAsync(int sceneIndex)
+
+    public void QuitApp()
     {
-        Debug.Log("AsyncLoad: sceneIndex = " + sceneIndex);
-
-        var scene = SceneManager.LoadSceneAsync(sceneIndex);
-        scene.allowSceneActivation = false;
-
-        var progress = scene.progress;
-
-        do 
-        {
-            await Task.Delay(100);
-            Debug.Log("Waited 100");
-        } while (scene.progress < 0.9f);
-
-        scene.allowSceneActivation = true;
-        await Task.Delay(1);
-
-        UpdateCurrentSceneIndex();
-        Debug.Log("AsyncLoad: New CurrentScene = " + currentSceneIndex);
-        UpdateMetaState(MetaState.GameManager);
-    }
-
-    public void QuitGame()
-    {
-        UpdateMetaState(MetaState.QuitApplication);
+        UpdateMetaState(MetaState.QuitApp);
     }
 
 }
 
-    public enum MetaState
+public enum MetaState
 {
-    MainMenu,
-    LoadScene,
-    GameManager,
-    QuitApplication
+    SetupApp = 1,
+    MainMenu = 2,
+    LoadScene = 3,
+    GameManager = 4,
+    QuitMenu = 5,
+    QuitApp = 6
 }
 
 
 
 // ==NOTES==
 
+
+// Variables do NOT reset between Playtest sessions
+// Try using Instance.currentSceneIndex in the code body
+// This seems to have fixed it
+
+
+// Debug.Log("MetaMgr Start: MetaState = " + _metaState); 
+// Why is this debug log coming out as an integer? 
+// And not the right integer for the Enum type..
+// But only if you pause the playtest before pressing the Start button (O_o)
+
+
+// HandleMainMenu
+// MetaUI activated automatically during this MetaState by MetaMenuManager
+// Called automatically when game is initialized so we don't want to immediately LoadLevel
+// Could do things here like instantiating the Main Menu or other GameObjects in a specific order,
+// setting up audio managers, etc
+
+
+
+// FinalSceneIndex
+// BuildIndex starts at 0 so remove 1
+// Try "Instance.variable" as the variables don't seem to be resetting between Playtests
 
 // DontDestroyOnLoad(gameObject);
 // "gameObject" NOT "GameObject" as the latter will throw an error!!
@@ -210,12 +224,23 @@ public class MetaManager : MonoBehaviour
 //    }
 
 
+// HandleQuitApp
+// Initially had wrong order.. Needed to..
+// Change the MetaState > MetaState.QuitMenu
+// That will display the Quit Menu
+// On button press change to MetaState QuitApp
+// That triggers Quit Application
+
+
 // Updating MetaState >> LoadScene should automatically trigger
 // HandleLoadScene();
 
 
 // Updating MetaState >> QuitApplication should automatically trigger
 // HandleLoadScene();
+
+// Get Enum member from int
+// https://answers.unity.com/questions/447240/get-enum-member-from-int.html
 
 
 // We have GameManager to handle transitions in a single game level. See GameManager notes.
@@ -248,3 +273,19 @@ public class MetaManager : MonoBehaviour
 //
 // https://www.youtube.com/watch?v=OmobsXZSRKo
 // ..
+
+
+// Really good explanation of SerializeField
+// 
+// https://gamedevbeginner.com/how-to-get-a-variable-from-another-script-in-unity-the-right-way/
+//
+// This will show in the inspector
+// [SerializeField]
+// private float playerHealth;
+//
+// This will not show in the inspector
+// [HideInInspector]
+// public float playerHealth;
+//
+// Generally speaking, it’s good practice to only make a variable public if other scripts need to access it and, if they don’t, to keep it private.
+// If, however, other scripts do not need to access it, but you do need to see it in the inspector then you can use Serialize Field instead.
