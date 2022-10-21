@@ -20,6 +20,9 @@ public class MetaManager : MonoBehaviour
     [HideInInspector] public int finalSceneIndex;
     [HideInInspector] public int sceneToLoad = 1;
 
+    [HideInInspector] public bool LoadingComplete; 
+    // Should probably use SceneActivation instead but going to try a quick fix
+
     private void Awake()
     {
         if (Instance == null)
@@ -87,9 +90,24 @@ public class MetaManager : MonoBehaviour
         Debug.Log("HandleSetupApp: MetaState = " + _metaState);
     }
 
+    public void TransitionToMainMenu()
+    {
+        // Check conditions to switch MetaState 
+        // If all conditions are met, change the MetaState
+        // Possibly call this from Update??
+        // This could decouple the calling methods too as they can simply
+        // trigger public switches etc..
+    }
+
     private void HandleMainMenu()
     {
         Debug.Log("HandleMainMenu: MetaState = " + _metaState);
+    }
+
+    public void TransitionToLoadScene()
+    {
+        // Check conditions to switch MetaState 
+        // If all conditions are met, change the MetaState
     }
 
     private void HandleLoadScene()
@@ -100,16 +118,45 @@ public class MetaManager : MonoBehaviour
         Debug.Log("HandleLoadScene: SceneToLoad = " + Instance.sceneToLoad);
     }
 
+    public void TransitionToGameManager()
+    {
+        // Check conditions to switch MetaState 
+        // If all conditions are met, change the MetaState
+        UpdateCurrentSceneIndex();
+        Debug.Log("AsyncLoad: newCurrentSceneIndex = " + Instance.currentSceneIndex);
+        Debug.Log("AsyncLoad: finalSceneIndex = " + finalSceneIndex);
+
+        if (Instance.currentSceneIndex == finalSceneIndex)
+        {
+            MetaManager.Instance.UpdateMetaState(MetaState.QuitMenu);
+        }
+        else
+        {
+            MetaManager.Instance.UpdateMetaState(MetaState.GameManager);
+        }
+    }
+
     private void HandleGameManager()
     {
         Debug.Log("HandleGameManager: MetaState = " + _metaState);
         Debug.Log("MetaManager: Hand over to GameManager");
     }
 
+    public void TransitionToQuitMenu()
+    {
+        // Check conditions to switch MetaState 
+        // If all conditions are met, change the MetaState
+    }
+
     private void HandleQuitMenu()
     {
         Debug.Log("HandleQuitMenu: MetaState = " + _metaState);
+    }
 
+    public void TransitionToQuitApp()
+    {
+        // Check conditions to switch MetaState 
+        // If all conditions are met, change the MetaState
     }
 
     private void HandleQuitApplication()
@@ -118,6 +165,10 @@ public class MetaManager : MonoBehaviour
         Application.Quit();
         Debug.Log("QUIT APPLICATION");
     }
+
+    // REFACTOR ALL BELOW INTO
+    // >> MetaUI?
+    // >> LoadingHandler??
 
     public void LoadMainMenuScene()
     {

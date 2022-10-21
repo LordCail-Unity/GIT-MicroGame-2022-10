@@ -14,7 +14,8 @@ public class LoadingHandler : MonoBehaviour
 
     private int sceneIndexToLoad;
 
-    public float loadingUIDelaySecs = 0.3f; // Loading screen is too fast to see so tiny delay.
+    public float loadingUIDelaySecs = .05f; 
+    // Loading screen is too fast to see so tiny delay.
 
     private void Start()
     {
@@ -43,7 +44,18 @@ public class LoadingHandler : MonoBehaviour
     IEnumerator AsyncLoad(int sceneIndex, float delaySecs)
     {
 
-        //Prevent scene activation?
+        // GameManager gets activated as soon as the scene is loaded
+        // Try SceneActivation code
+        // Also can make sure that GameManager activates StartUI after a trigger,
+        // not automatically.
+
+        // REFACTOR
+        // https://docs.unity3d.com/ScriptReference/AsyncOperation-allowSceneActivation.html
+        // When allowSceneActivation is set to false, Unity stops progress at 0.9, and
+        // maintains.isDone at false. When AsyncOperation.allowSceneActivation is set to true,
+        // isDone can complete. While isDone is false, the AsyncOperation queue is stalled. 
+
+        //Prevent scene activation
         //var scene = SceneManager.LoadSceneAsync(sceneIndex);
         //scene.allowSceneActivation = false;
 
@@ -60,11 +72,11 @@ public class LoadingHandler : MonoBehaviour
         {
             yield return new WaitForSecondsRealtime(delaySecs);
             Debug.Log("Waited for: " + delaySecs);
-            if(loadPercent <= operation.progress)
-            { loadPercent = loadPercent + 0.1f; }
+            if (loadPercent <= operation.progress)
+            { loadPercent = loadPercent + .05f; }
             Debug.Log("Operation %:" + loadPercent * 100);
             UpdateSlider(loadPercent);
-            yield return null;
+            yield return null; // waits one frame before proceeding
         }
 
         Debug.Log("AsyncLoad Completed: sceneIndex = " + sceneIndex);
@@ -77,13 +89,14 @@ public class LoadingHandler : MonoBehaviour
             yield return new WaitForSecondsRealtime(delaySecs);
             Debug.Log("Waited for: " + delaySecs);
 
-            loadPercent = loadPercent + 0.1f;
-            // |OR| loadPercent += 0.1f
+            loadPercent = loadPercent + .05f; // |SAME AS| loadPercent += 0.1f
             UpdateSlider(loadPercent);
             yield return null;
         } 
 
         loadPercent = 1f;
+        _metaManager.LoadingComplete = true;
+        Debug.Log(_metaManager.LoadingComplete.ToString());
 
         yield return new WaitForSecondsRealtime(delaySecs);
 
@@ -98,22 +111,8 @@ public class LoadingHandler : MonoBehaviour
         yield return new WaitForSecondsRealtime(delaySecs);
         // Delay to allow SceneActivation to kick in before moving to next action
 
-        _metaManager.UpdateCurrentSceneIndex();
+        _metaManager.TransitionToGameManager();
 
-        var newCurrentSceneIndex = _metaManager.currentSceneIndex;
-        var finalSceneIndex = _metaManager.finalSceneIndex;
-
-        Debug.Log("AsyncLoad: newCurrentSceneIndex = " + newCurrentSceneIndex);
-        Debug.Log("AsyncLoad: finalSceneIndex = " + finalSceneIndex);
-
-        if (newCurrentSceneIndex == finalSceneIndex)
-        {
-            MetaManager.Instance.UpdateMetaState(MetaState.QuitMenu);
-        }
-        else
-        {
-            MetaManager.Instance.UpdateMetaState(MetaState.GameManager);
-        }
     }
 
 }
