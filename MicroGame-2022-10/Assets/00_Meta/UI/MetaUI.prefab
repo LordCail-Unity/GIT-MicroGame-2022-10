@@ -126,6 +126,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 7460614311271398963}
     m_Modifications:
+    - target: {fileID: 2170618132110329807, guid: 1ce985a6d7fcba54fa222051e32e63c9, type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2958324645147773226, guid: 1ce985a6d7fcba54fa222051e32e63c9, type: 3}
       propertyPath: m_Name
       value: LoadingScreenUI
@@ -216,6 +220,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5740450722319371038, guid: 1ce985a6d7fcba54fa222051e32e63c9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6863716005710514003, guid: 1ce985a6d7fcba54fa222051e32e63c9, type: 3}
+      propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

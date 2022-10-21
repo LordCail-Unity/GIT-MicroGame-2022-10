@@ -1,6 +1,5 @@
 using System; // Required for..  public static event Action<>
 // using System.Collections; // Required for IEnumerator Coroutines but not currently using
-using System.Threading.Tasks; // Required for Task.Delay
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -16,10 +15,10 @@ public class MetaManager : MonoBehaviour
     public int firstSceneIndex = 1;
 
     public float loadingUIDelaySecs = 0.1f;
-
-    private int currentSceneIndex = 0;
-    private int sceneToLoad = 1;
-    private int finalSceneIndex;
+    
+    [HideInInspector] public int currentSceneIndex = 0;
+    [HideInInspector] public int finalSceneIndex;
+    [HideInInspector] public int sceneToLoad = 1;
 
     private void Awake()
     {
@@ -48,7 +47,7 @@ public class MetaManager : MonoBehaviour
         Debug.Log("MetaMgr Start: finalSceneIndex = " + Instance.finalSceneIndex);
     }
 
-    private void UpdateCurrentSceneIndex()
+    public void UpdateCurrentSceneIndex()
     {
         Instance.currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
     }
@@ -99,8 +98,6 @@ public class MetaManager : MonoBehaviour
 
         Debug.Log("HandleLoadScene: Current Scene = " + Instance.currentSceneIndex);
         Debug.Log("HandleLoadScene: SceneToLoad = " + Instance.sceneToLoad);
-
-        LoadSceneAsync(Instance.sceneToLoad);
     }
 
     private void HandleGameManager()
@@ -143,43 +140,6 @@ public class MetaManager : MonoBehaviour
         UpdateMetaState(MetaState.LoadScene);
     }
 
-    public async void LoadSceneAsync(int sceneIndex)
-    {
-        Debug.Log("AsyncLoad: sceneIndex = " + sceneIndex);
-
-        var scene = SceneManager.LoadSceneAsync(sceneIndex);
-        scene.allowSceneActivation = false;
-
-        var progress = scene.progress;
-
-        // Can we change this to an Operation style method 
-        // like the one we used in the Brackeys Loading tutorial?
-        // Effect is the same but it feels cleaner
-
-        do 
-        {
-            await Task.Delay(1000);
-            Debug.Log("Waited 100");
-        } 
-        while (scene.progress < 0.9f);
-
-        scene.allowSceneActivation = true;
-        await Task.Delay(1); 
-        // Delay to allow SceneActivation to kick in before moving to next action
-
-        UpdateCurrentSceneIndex();
-        Debug.Log("AsyncLoad: New currentSceneIndex = " + Instance.currentSceneIndex);
-        Debug.Log("AsyncLoad: finalSceneIndex = " + Instance.finalSceneIndex);
-
-        if (Instance.currentSceneIndex == Instance.finalSceneIndex)
-        {
-            UpdateMetaState(MetaState.QuitMenu);
-        }
-        else
-        {
-            UpdateMetaState(MetaState.GameManager);
-        }
-    }
 
     public void QuitApp()
     {
@@ -313,3 +273,19 @@ public enum MetaState
 //
 // https://www.youtube.com/watch?v=OmobsXZSRKo
 // ..
+
+
+// Really good explanation of SerializeField
+// 
+// https://gamedevbeginner.com/how-to-get-a-variable-from-another-script-in-unity-the-right-way/
+//
+// This will show in the inspector
+// [SerializeField]
+// private float playerHealth;
+//
+// This will not show in the inspector
+// [HideInInspector]
+// public float playerHealth;
+//
+// Generally speaking, it’s good practice to only make a variable public if other scripts need to access it and, if they don’t, to keep it private.
+// If, however, other scripts do not need to access it, but you do need to see it in the inspector then you can use Serialize Field instead.
