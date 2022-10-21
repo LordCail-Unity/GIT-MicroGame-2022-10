@@ -164,7 +164,7 @@ public class MetaManager : MonoBehaviour
 
         do 
         {
-            await Task.Delay(100);
+            await Task.Delay(1000);
             Debug.Log("Waited 100");
         } while (scene.progress < 0.9f);
 
