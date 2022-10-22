@@ -129,6 +129,10 @@ public class MetaManager : MonoBehaviour
         Debug.Log("AsyncLoad: newCurrentSceneIndex = " + Instance.currentSceneIndex);
         Debug.Log("AsyncLoad: finalSceneIndex = " + finalSceneIndex);
 
+        // MOVE THIS CHECK BEFORE LOADING SCREEN
+        // CURRENTLY IT SHOWS LOADING SCREEN BEFORE 
+        // QUIT SCREEN
+
         if (Instance.currentSceneIndex == finalSceneIndex)
         {
             MetaManager.Instance.UpdateMetaState(MetaState.QuitMenu);
@@ -189,7 +193,7 @@ public class MetaManager : MonoBehaviour
 
     public void LoadThisScene()
     {
-        Debug.Log("MetaManager.ReloadThisScene");
+        Debug.Log("MetaManager.LoadThisScene");
         Instance.sceneToLoad = Instance.currentSceneIndex;
         UpdateMetaState(MetaState.LoadScene);
     }

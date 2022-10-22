@@ -12,6 +12,9 @@ public class GameManager : MonoBehaviour
 
     public static event Action<GameState> OnGameStateChanged;
 
+    private int StartLevelDelaySecs = 1;
+    // private so we don't need to Reset GameManager every time we change it
+
     private void Awake()
     {
         Debug.Log("GameManager Awake()");
@@ -160,9 +163,7 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator Countdown()
     {
-        int StartLevelDelay = 3;
-        // Hardcoded delay in seconds
-        yield return StartCoroutine(Wait(StartLevelDelay));
+        yield return StartCoroutine(Wait(StartLevelDelaySecs));
         // Feeding delay in seconds to Wait coroutine
 
         UpdateGameState(GameState.PlayLevel);

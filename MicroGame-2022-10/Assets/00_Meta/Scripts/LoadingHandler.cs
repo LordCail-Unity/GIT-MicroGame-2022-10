@@ -14,14 +14,31 @@ public class LoadingHandler : MonoBehaviour
 
     private int sceneIndexToLoad;
 
-    public float loadingUIDelaySecs = .05f; 
+    private float loadingUIDelaySecs = .05f; 
     // Loading screen is too fast to see so tiny delay.
+
+    private void Awake()
+    {
+        Debug.Log("LoadingHandler.Awake");
+        _metaManager = FindObjectOfType<MetaManager>();
+    }
+
+    private void OnEnable()
+    {
+        //While Start will only ever be called once,
+        //On Enable is called every time the script component,
+        //or the object it's attached to, is enabled.
+
+        Debug.Log("LoadingHandler.OnEnable");
+        GetSceneToLoad();
+        StartAsyncLoadCoroutine();
+
+        //OnEnable called BEFORE Start
+    }
 
     private void Start()
     {
-        _metaManager = FindObjectOfType<MetaManager>();
-        GetSceneToLoad();
-        StartAsyncLoadCoroutine();
+        
     }
 
     private void GetSceneToLoad()
