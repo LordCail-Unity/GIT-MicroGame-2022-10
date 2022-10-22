@@ -44,75 +44,91 @@ public class LoadingHandler : MonoBehaviour
     IEnumerator AsyncLoad(int sceneIndex, float delaySecs)
     {
 
-        // GameManager gets activated as soon as the scene is loaded
-        // Try SceneActivation code
-        // Also can make sure that GameManager activates StartUI after a trigger,
-        // not automatically.
-
-        // REFACTOR
-        // https://docs.unity3d.com/ScriptReference/AsyncOperation-allowSceneActivation.html
-        // When allowSceneActivation is set to false, Unity stops progress at 0.9, and
-        // maintains.isDone at false. When AsyncOperation.allowSceneActivation is set to true,
-        // isDone can complete. While isDone is false, the AsyncOperation queue is stalled. 
-
-        //Prevent scene activation
-        //var scene = SceneManager.LoadSceneAsync(sceneIndex);
-        //scene.allowSceneActivation = false;
-
         yield return new WaitForSecondsRealtime(delaySecs);
 
-        AsyncOperation operation = SceneManager.LoadSceneAsync(sceneIndex);
+
+        AsyncOperation _asyncOperation = SceneManager.LoadSceneAsync(sceneIndex); // Can use sceneIndex OR sceneName
         // OPTIONAL: LoadSceneAsync(sceneIndex, LoadSceneMode.Additive)
 
-        Debug.Log("AsyncLoad Started: sceneIndex = " + sceneIndex);
+        _asyncOperation.allowSceneActivation = false;
+
+        Debug.Log("_asyncOperation Started: sceneIndex = " + sceneIndex);
 
         float loadPercent = 0f;
 
-        while (!operation.isDone)
+        while (!_asyncOperation.isDone)
         {
             yield return new WaitForSecondsRealtime(delaySecs);
-            Debug.Log("Waited for: " + delaySecs);
-            if (loadPercent <= operation.progress)
+            Debug.Log("WhileLoop1 Waited for: " + delaySecs);
+            if (loadPercent <= _asyncOperation.progress)
             { loadPercent = loadPercent + .05f; }
-            Debug.Log("Operation %:" + loadPercent * 100);
+            Debug.Log("AsyncOperation:" + loadPercent * 100 + "%");
             UpdateSlider(loadPercent);
-            yield return null; // waits one frame before proceeding
+
+            _asyncOperation.allowSceneActivation = true;
+            Debug.Log("AsyncLoad Completed: SceneActivated = " + sceneIndex);
         }
 
-        Debug.Log("AsyncLoad Completed: sceneIndex = " + sceneIndex);
-        Debug.Log("LoadPercent %:" + loadPercent * 100);
+        // One frame delay to allow SceneActivation to kick in before moving to next action
+        yield return null;
 
-        //Why is this NOT delaying for seconds??
+        Debug.Log("_asyncOperation Completed: sceneIndex = " + sceneIndex);
+        Debug.Log("LoadPercent:" + loadPercent * 100 + "%");
 
-        while (loadPercent < 1f)
+        while (loadPercent <= 0.9f)
         {
             yield return new WaitForSecondsRealtime(delaySecs);
-            Debug.Log("Waited for: " + delaySecs);
+            Debug.Log("WhileLoop2 Waited for: " + delaySecs);
 
-            loadPercent = loadPercent + .05f; // |SAME AS| loadPercent += 0.1f
+            loadPercent = loadPercent + 0.05f;
+            // |SAME AS| loadPercent += 0.05f;
             UpdateSlider(loadPercent);
-            yield return null;
-        } 
+        }
 
         loadPercent = 1f;
-        _metaManager.LoadingComplete = true;
-        Debug.Log(_metaManager.LoadingComplete.ToString());
-
-        yield return new WaitForSecondsRealtime(delaySecs);
-
         UpdateSlider(loadPercent);
-        //Gives the effect of 100% completion just before starting the round
-        //Could use DOTween to smooth this but surely we have better things to work on (>_<)
 
-        //scene.allowSceneActivation = true;
-        // May be unnecessary if we use Operation method as the DoWhile method relied on 0.9 completion
-        // Which yields before Unity's final >0.9 loading operation is complete
+        //_metaManager.LoadingComplete = true;
+        //Debug.Log(_metaManager.LoadingComplete.ToString());
 
         yield return new WaitForSecondsRealtime(delaySecs);
-        // Delay to allow SceneActivation to kick in before moving to next action
 
         _metaManager.TransitionToGameManager();
 
     }
 
 }
+
+
+// ==NOTES==
+
+// GameManager gets activated as soon as the scene is loaded
+// This activates the GameUI which is overlaying the LoadingUI 
+// making it look like the LoadingUI isn't working even though it is
+//
+// We can:
+// (1) Delay SceneActivation
+// -- but does this delay the GameSetup?
+// (2) Delay GameUI until a condition is met
+// -- Probably preferable as it gives us more control and ensures everything
+// is set up and ready to go as soon as the switch is flipped..
+//
+// Try SceneActivation code
+// Also can make sure that GameManager activates StartUI after a trigger,
+// not automatically.
+
+// REFACTOR
+// https://docs.unity3d.com/ScriptReference/AsyncOperation-allowSceneActivation.html
+// When allowSceneActivation is set to false, Unity stops progress at 0.9, and
+// maintains.isDone at false. When AsyncOperation.allowSceneActivation is set to true,
+// isDone can complete. While isDone is false, the AsyncOperation queue is stalled. 
+
+//var sceneName = SceneManager.GetSceneByBuildIndex(sceneIndex).name; 
+
+
+//Gives the effect of 100% completion just before starting the round
+//Could use DOTween to smooth this but surely we have better things to work on (>_<)
+
+//scene.allowSceneActivation = true;
+// May be unnecessary if we use Operation method as the DoWhile method relied on 0.9 completion
+// Which yields before Unity's final >0.9 loading operation is complete

@@ -9,12 +9,15 @@ public class MetaManager : MonoBehaviour
     public static MetaManager Instance;
     public MetaState _metaState;
 
+    private GameManager _gameManager;
+
     public static event Action<MetaState> OnMetaStateChanged;
 
     public int mainMenuSceneIndex = 0; 
     public int firstSceneIndex = 1;
 
-    public float loadingUIDelaySecs = 0.1f;
+    // Moved to LoadingHandler
+    // public float loadingUIDelaySecs = 0.1f;
     
     [HideInInspector] public int currentSceneIndex = 0;
     [HideInInspector] public int finalSceneIndex;
@@ -140,6 +143,10 @@ public class MetaManager : MonoBehaviour
     {
         Debug.Log("HandleGameManager: MetaState = " + _metaState);
         Debug.Log("MetaManager: Hand over to GameManager");
+
+        _gameManager = FindObjectOfType<GameManager>();
+        _gameManager.UpdateGameState(GameState.StartLevel);
+
     }
 
     public void TransitionToQuitMenu()
@@ -167,8 +174,11 @@ public class MetaManager : MonoBehaviour
     }
 
     // REFACTOR ALL BELOW INTO
-    // >> MetaUI?
-    // >> LoadingHandler??
+    //
+    // >> MetaUI >> Possible
+    //
+    // >> LoadingHandler >> NO
+    // CANNOT be called by LoadingHandler because this sequence ACTIVATES LoadingHandler
 
     public void LoadMainMenuScene()
     {

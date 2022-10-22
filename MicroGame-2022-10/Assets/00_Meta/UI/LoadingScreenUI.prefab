@@ -327,7 +327,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _loadingSlider: {fileID: 6735063725094350304}
   _loadingPercentText: {fileID: 2739110694422182518}
-  loadingUIDelaySecs: 0.3
+  loadingUIDelaySecs: 0.05
 --- !u!1 &3043377406531380147
 GameObject:
   m_ObjectHideFlags: 0
