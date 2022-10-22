@@ -12,6 +12,9 @@ public class GameManager : MonoBehaviour
 
     public static event Action<GameState> OnGameStateChanged;
 
+    private int StartLevelDelaySecs = 1;
+    // private so we don't need to Reset GameManager every time we change it
+
     private void Awake()
     {
         Debug.Log("GameManager Awake()");
@@ -21,7 +24,7 @@ public class GameManager : MonoBehaviour
         else { Destroy(gameObject); }
 
         UpdateGameState(GameState.SetupLevel);
-        Debug.Log("GameManager: GameState = " + _gameState);
+        // Unnecessary as SetupLevel is default but just in case..
     }
 
     private void Start()
@@ -35,8 +38,8 @@ public class GameManager : MonoBehaviour
         DisablePlayerMovement();
         Debug.Log("GameManager: PlayerController disabled");
 
-        UpdateGameState(GameState.StartLevel);
-        Debug.Log("GameManager: GameState = " + _gameState);
+        // UpdateGameState(GameState.StartLevel);
+        // DISABLED: Wait for MetaManager to trigger StartLevel
     }
 
     private void Update()
@@ -85,17 +88,20 @@ public class GameManager : MonoBehaviour
 
     private void HandleSetupLevel()
     {
+        Debug.Log("GameManager: GameState = " + _gameState);
         // Wait for MetaManager to finish loading processes
         // MetaManager will then trigger StartLevel
     }
 
     private void HandleStartLevel()
     {
+        Debug.Log("GameManager: GameState = " + _gameState);
         StartCoroutine(Countdown());
     }
 
     private void HandlePlayLevel()
     {
+        Debug.Log("GameManager: GameState = " + _gameState);
         EnablePlayerMovement();
 
         // TO DO
@@ -105,6 +111,7 @@ public class GameManager : MonoBehaviour
 
     private void HandlePauseLevel()
     {
+        Debug.Log("GameManager: GameState = " + _gameState);
         DisablePlayerMovement();
 
         // TO DO
@@ -113,6 +120,7 @@ public class GameManager : MonoBehaviour
 
     private void HandleRestartLevel()
     {
+        Debug.Log("GameManager: GameState = " + _gameState);
         DisablePlayerMovement();
 
         // TO DO
@@ -128,6 +136,7 @@ public class GameManager : MonoBehaviour
 
     private void HandleCompleteLevel()
     {
+        Debug.Log("GameManager: GameState = " + _gameState);
         DisablePlayerMovement();
 
         // TO DO
@@ -154,9 +163,7 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator Countdown()
     {
-        int StartLevelDelay = 3;
-        // Hardcoded delay in seconds
-        yield return StartCoroutine(Wait(StartLevelDelay));
+        yield return StartCoroutine(Wait(StartLevelDelaySecs));
         // Feeding delay in seconds to Wait coroutine
 
         UpdateGameState(GameState.PlayLevel);
