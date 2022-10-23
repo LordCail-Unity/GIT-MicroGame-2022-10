@@ -227,6 +227,11 @@ public enum MetaState
 
 // ==NOTES==
 
+// READ THE WHOLE THREAD LINKED HERE ESPECIALLY THE COMMENTS 
+// Outlines multiple different ways to approach this issue
+//
+// https://stackoverflow.com/questions/35890932/unity-game-manager-script-works-only-one-time/35891919#35891919
+
 
 // Variables do NOT reset between Playtest sessions
 // Try using Instance.currentSceneIndex in the code body
