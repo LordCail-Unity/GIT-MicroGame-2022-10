@@ -30,6 +30,7 @@ public class GameManager : MonoBehaviour
     public static event Action<GameState> OnGameStateChanged;
 
     private int StartLevelDelaySecs = 1;
+    private int menuUIDelaySecs = 2;
     // private so we don't need to Reset GameManager every time we change it
 
     [HideInInspector] public bool levelCompleted = false;
@@ -133,17 +134,26 @@ public class GameManager : MonoBehaviour
 
     private void HandleExitLevel()
     {
-        // Stop doing stuff..
-        // Where should we trigger this? 
-        // MetaManager??
-
-        // --PLAYER CTRL-- Disable player controller
-        // Hand back to MetaManager to destroy this level / scene
-
         Debug.Log("GameManager: GameState = " + _gameState);
 
         DisablePlayerMovement();
         Debug.Log("Player movement disabled");
+
+        StartCoroutine(ExitActions());
+    }
+
+    private IEnumerator ExitActions()
+    {
+        // Stop doing stuff..
+        // Where should we trigger this? 
+        // Currently PlayerCollision but move to GameManager?? 
+
+        // --PLAYER CTRL-- Disable player controller
+        // Hand back to MetaManager to destroy this level / scene
+
+        yield return StartCoroutine(Wait(menuUIDelaySecs));
+        Debug.Log("StartCoroutine(Wait(menuUIDelaySecs))");
+        // Feeding delay in seconds to Wait coroutine
 
         if (levelCompleted == true)
         {
@@ -158,6 +168,12 @@ public class GameManager : MonoBehaviour
     private void DisablePlayerMovement()
     {
         PlayerController.Instance.enabled = false;
+        Debug.Log("PlayerController.Instance.enabled = " + PlayerController.Instance.enabled.ToString());
+
+        // Prevents multiple collisions eg with obstacles
+        // PlayerCollision.Instance.enabled = false;
+        // Debug.Log("PlayerCollision.Instance.enabled = " + PlayerController.Instance.enabled.ToString());
+
         // _playerController.enabled = false;
         // REFACTORED as public static PlayerController Instance
     }
@@ -165,8 +181,15 @@ public class GameManager : MonoBehaviour
     private void EnablePlayerMovement()
     {
         PlayerController.Instance.enabled = true;
+        Debug.Log("PlayerController.Instance.enabled = " + PlayerController.Instance.enabled.ToString());
+
         // _playerController.enabled = true;
         // REFACTORED as public static PlayerController Instance
+
+        // Disabling prevents multiple collisions eg with obstacles
+        // As we are disabling it in the "Disable Player" we need to enable it too
+        // PlayerCollision.Instance.enabled = true;
+        // Debug.Log("PlayerCollision.Instance.enabled = " + PlayerController.Instance.enabled.ToString());
     }
 
     private IEnumerator Countdown()
@@ -180,7 +203,7 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator Wait(int delaySecs)
     {
-        Debug.Log("GameManager: Waiting started");
+        Debug.Log("IEnumerator Wait: Waiting started");
 
         for (int i = 0; i < delaySecs; i++)
         {
@@ -194,7 +217,7 @@ public class GameManager : MonoBehaviour
             // eg Coroutine: Disable PlayerController | Show tutorial text Wait until key pressed
         }
 
-        Debug.Log("GameManager: Waiting completed");
+        Debug.Log("IEnumerator Wait: Waiting completed");
     }
 
     public void UnpauseGame()

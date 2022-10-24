@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.EventSystems; // To reset UI button focus
 
 public class MetaUI : MonoBehaviour
 {
@@ -38,11 +39,18 @@ public class MetaUI : MonoBehaviour
 
     private void MetaManager_OnMetaStateChanged(MetaState state)
     {
+        ResetUI();
         MainMenuUI.SetActive(state == MetaState.MainMenu);
         LoadingScreenUI.SetActive(state == MetaState.LoadScene);
         RestartLevelUI.SetActive(state == MetaState.RestartLevel);
         CompleteLevelUI.SetActive(state == MetaState.CompleteLevel);
         QuitMenuUI.SetActive(state == MetaState.QuitMenu);
+    }
+
+    private void ResetUI()
+    {
+        EventSystem.current.SetSelectedGameObject(null);
+        Debug.Log("UI Focus GameObject Reset to null");
     }
 
 }

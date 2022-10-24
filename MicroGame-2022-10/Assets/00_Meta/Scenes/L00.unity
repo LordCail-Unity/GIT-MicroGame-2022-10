@@ -275,10 +275,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: MetaUI
       objectReference: {fileID: 0}
-    - target: {fileID: 8961275293471730974, guid: 33b1efefa5b0c394d98596a8a4ad4215, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 33b1efefa5b0c394d98596a8a4ad4215, type: 3}
 --- !u!1001 &9211843487859961613

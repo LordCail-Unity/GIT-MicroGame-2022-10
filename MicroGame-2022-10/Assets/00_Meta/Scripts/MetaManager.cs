@@ -117,6 +117,9 @@ public class MetaManager : MonoBehaviour
 
     private void HandleMainMenu()
     {
+        // Figure out how to load MainMenu scene without stuffing 
+        // everything up..
+        
         Debug.Log("MetaManager: MetaState = " + _metaState);
 
         UpdateCurrentSceneIndex();
