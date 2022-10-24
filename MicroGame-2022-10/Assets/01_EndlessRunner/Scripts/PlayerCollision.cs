@@ -9,8 +9,10 @@ public class PlayerCollision : MonoBehaviour
         {
             Debug.Log("Collision: Obstacle");
 
-            GameManager.Instance.UpdateGameState(GameState.RestartLevel);
-            Debug.Log("GameManager State >> RestartLevel");
+            Debug.Log("LevelCompleted T/F:" + GameManager.Instance.levelCompleted.ToString());
+
+            GameManager.Instance.UpdateGameState(GameState.ExitLevel);
+            Debug.Log("GameManager State >> ExitLevel");
         }
     }
 
@@ -20,17 +22,22 @@ public class PlayerCollision : MonoBehaviour
         {
             Debug.Log("Trigger Activated: Killzone");
 
-            FindObjectOfType<PlayerController>().SinkingFeeling();
+            PlayerController.Instance.SinkingFeeling();
 
-            GameManager.Instance.UpdateGameState(GameState.RestartLevel);
-            Debug.Log("GameManager State >> RestartLevel");
+            Debug.Log("LevelCompleted T/F:" + GameManager.Instance.levelCompleted.ToString());
+
+            GameManager.Instance.UpdateGameState(GameState.ExitLevel);
+            Debug.Log("GameManager State >> ExitLevel");
         }
         if (triggerCollider.tag == "Finish")
         {
             Debug.Log("Trigger Activated: Finish");
 
-            GameManager.Instance.UpdateGameState(GameState.CompleteLevel);
-            Debug.Log("GameManager State >> CompleteLevel");
+            GameManager.Instance.levelCompleted = true; // Default = false;
+            Debug.Log("LevelCompleted T/F:" + GameManager.Instance.levelCompleted.ToString());
+
+            GameManager.Instance.UpdateGameState(GameState.ExitLevel);
+            Debug.Log("GameManager State >> ExitLevel");
         }
     }
 

@@ -1,13 +1,17 @@
 using System.Collections; // Required for IEnumerator
-using System.Threading.Tasks; // Required for Task.Delay
+// using System.Threading.Tasks; // Required for Task.Delay used in Async methods
+// DON'T USE ASYNC METHOD TYPE AS IT IS INCOMPATIBLE WITH WEBGL
 using UnityEngine;
 using UnityEngine.UI; // Required for access to Slider objects
 using UnityEngine.SceneManagement; // Required for Load Scene
 
 public class LoadingHandler : MonoBehaviour
 {
+    // MetaManager is a global static instance so don't need this:
+    // private MetaManager _metaManager;
 
-    private MetaManager _metaManager;
+    // To call methods simply use MetaManager.Instance.xyzmethod(); 
+    // To call variables simply use MetaManager.Instance.xyzvariable; 
 
     [SerializeField] private Slider _loadingSlider;
     [SerializeField] private TMPro.TMP_Text _loadingPercentText;
@@ -20,14 +24,21 @@ public class LoadingHandler : MonoBehaviour
     private void Awake()
     {
         Debug.Log("LoadingHandler.Awake");
-        _metaManager = FindObjectOfType<MetaManager>();
+        // MetaManager is a global static instance so don't need this:
+        //_metaManager = FindObjectOfType<MetaManager>();
+
+        // To call methods simply use MetaManager.Instance.xyzmethod(); 
+        // To call variables simply use MetaManager.Instance.xyzvariable; 
     }
 
     private void OnEnable()
     {
-        //While Start will only ever be called once,
-        //On Enable is called every time the script component,
-        //or the object it's attached to, is enabled.
+        // !!IMPORTANT!!
+        // While Start will only ever be called once after creation,
+        // On Enable is called every time the script component,
+        // or the object it's attached to, is enabled.
+        // This is essential here as we are not destroying and creating LoadingHandler,
+        // we are Enabling and Disabling it as required.
 
         Debug.Log("LoadingHandler.OnEnable");
         GetSceneToLoad();
@@ -38,12 +49,11 @@ public class LoadingHandler : MonoBehaviour
 
     private void Start()
     {
-        
     }
 
     private void GetSceneToLoad()
     {
-        sceneIndexToLoad = _metaManager.sceneToLoad;
+        sceneIndexToLoad = MetaManager.Instance.sceneToLoad;
     }
 
     public void StartAsyncLoadCoroutine()
@@ -71,47 +81,44 @@ public class LoadingHandler : MonoBehaviour
 
         Debug.Log("_asyncOperation Started: sceneIndex = " + sceneIndex);
 
-        float loadPercent = 0f;
+        float sliderPercent = 0f;
 
         while (!_asyncOperation.isDone)
         {
             yield return new WaitForSecondsRealtime(delaySecs);
             Debug.Log("WhileLoop1 Waited for: " + delaySecs);
-            if (loadPercent <= _asyncOperation.progress)
-            { loadPercent = loadPercent + .05f; }
-            Debug.Log("AsyncOperation:" + loadPercent * 100 + "%");
-            UpdateSlider(loadPercent);
+
+            if (sliderPercent <= _asyncOperation.progress)
+            { sliderPercent = sliderPercent + .05f; }
+            Debug.Log("sliderPercent:" + sliderPercent * 100 + "%");
+            UpdateSlider(sliderPercent);
 
             _asyncOperation.allowSceneActivation = true;
-            Debug.Log("AsyncLoad Completed: SceneActivated = " + sceneIndex);
+            Debug.Log("allowSceneActivation Completed: SceneActivated = " + sceneIndex);
         }
 
         // One frame delay to allow SceneActivation to kick in before moving to next action
         yield return null;
 
         Debug.Log("_asyncOperation Completed: sceneIndex = " + sceneIndex);
-        Debug.Log("LoadPercent:" + loadPercent * 100 + "%");
+        Debug.Log("_asyncOperation sliderPercent:" + sliderPercent * 100 + "%");
 
-        while (loadPercent <= 0.9f)
+        while (sliderPercent <= 1f)
         {
+            sliderPercent = sliderPercent + 0.05f;
+            // |SAME AS| loadPercent += 0.05f;
+            UpdateSlider(sliderPercent);
+
             yield return new WaitForSecondsRealtime(delaySecs);
             Debug.Log("WhileLoop2 Waited for: " + delaySecs);
-
-            loadPercent = loadPercent + 0.05f;
-            // |SAME AS| loadPercent += 0.05f;
-            UpdateSlider(loadPercent);
         }
 
-        loadPercent = 1f;
-        UpdateSlider(loadPercent);
-
-        //_metaManager.LoadingComplete = true;
-        //Debug.Log(_metaManager.LoadingComplete.ToString());
+        Debug.Log("SliderUpdate Completed:" + sliderPercent * 100 + "%");
+        Debug.Log("Final sliderPercent:" + sliderPercent * 100 + "%");
 
         yield return new WaitForSecondsRealtime(delaySecs);
 
-        _metaManager.TransitionToGameManager();
-
+        MetaManager.Instance.ChangeMetaStateToGameManager();
     }
 
 }
@@ -149,3 +156,6 @@ public class LoadingHandler : MonoBehaviour
 //scene.allowSceneActivation = true;
 // May be unnecessary if we use Operation method as the DoWhile method relied on 0.9 completion
 // Which yields before Unity's final >0.9 loading operation is complete
+
+// MetaManager.Instance.LoadingComplete = true;
+// Debug.Log(MetaManager.Instance.LoadingComplete.ToString());
