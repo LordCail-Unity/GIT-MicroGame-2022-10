@@ -7,6 +7,8 @@ public class MetaUI : MonoBehaviour
 
     public static MetaUI Instance;
 
+    // SerializeField = Show private field in Inspector
+
     [SerializeField] private GameObject MainMenuUI;
     [SerializeField] private GameObject LoadingScreenUI;
     [SerializeField] private GameObject RestartLevelUI;
