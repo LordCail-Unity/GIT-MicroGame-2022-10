@@ -5,10 +5,8 @@ public class GameUI : MonoBehaviour
 {
 
     [SerializeField] private GameObject StartLevelUI;
-    [SerializeField] private GameObject PlayLevelUI;
+    [SerializeField] private GameObject InGameHUDUI;
     [SerializeField] private GameObject PauseMenuUI;
-    [SerializeField] private GameObject RestartLevelUI;
-    [SerializeField] private GameObject CompleteLevelUI;
 
     private void Awake()
     {
@@ -24,10 +22,8 @@ public class GameUI : MonoBehaviour
     {
         // Each UI will only be SetActive IF current GameState == GameState.XYZ
         StartLevelUI.SetActive(state == GameState.StartLevel);
-        PlayLevelUI.SetActive(state == GameState.PlayLevel);
+        InGameHUDUI.SetActive(state == GameState.PlayLevel);
         PauseMenuUI.SetActive(state == GameState.PauseLevel);
-        RestartLevelUI.SetActive(state == GameState.RestartLevel);
-        CompleteLevelUI.SetActive(state == GameState.CompleteLevel);
     }
 
 }

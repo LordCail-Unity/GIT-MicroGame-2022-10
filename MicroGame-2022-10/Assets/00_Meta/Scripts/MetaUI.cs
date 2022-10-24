@@ -1,13 +1,18 @@
 using System;
 using UnityEngine;
+using UnityEngine.EventSystems; // To reset UI button focus
 
 public class MetaUI : MonoBehaviour
 {
 
     public static MetaUI Instance;
 
+    // SerializeField = Show private field in Inspector
+
     [SerializeField] private GameObject MainMenuUI;
     [SerializeField] private GameObject LoadingScreenUI;
+    [SerializeField] private GameObject RestartLevelUI;
+    [SerializeField] private GameObject CompleteLevelUI;
     [SerializeField] private GameObject QuitMenuUI;
 
     private void Awake()
@@ -15,7 +20,11 @@ public class MetaUI : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(gameObject); 
+            // Should probably only have one DDOL in your application.
+            // In our case that would be MetaManager.
+            // However we are using MetaUI as a persistent MainMenu system across all scenes
+            // so we'll leave it as DDOL for now.
         }
         else
         {
@@ -32,9 +41,18 @@ public class MetaUI : MonoBehaviour
 
     private void MetaManager_OnMetaStateChanged(MetaState state)
     {
+        ResetUI();
         MainMenuUI.SetActive(state == MetaState.MainMenu);
         LoadingScreenUI.SetActive(state == MetaState.LoadScene);
+        RestartLevelUI.SetActive(state == MetaState.RestartLevel);
+        CompleteLevelUI.SetActive(state == MetaState.CompleteLevel);
         QuitMenuUI.SetActive(state == MetaState.QuitMenu);
+    }
+
+    private void ResetUI()
+    {
+        EventSystem.current.SetSelectedGameObject(null);
+        Debug.Log("UI Focus GameObject Reset to null");
     }
 
 }

@@ -4,6 +4,8 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
 
+    public static PlayerController Instance;
+
     private Rigidbody _rigidbody; // most commonly "rb" instead of "_rigidbody"
 
     public float forwardForce = 500f;
@@ -21,19 +23,31 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
         GameManager.OnGameStateChanged += GameManager_OnGameStateChanged;
         Debug.Log("PlayerController: Subscribed to GameManager_OnGameStateChanged");
-
-        _rigidbody = this.GetComponent<Rigidbody>();
-    }
-
-    private void GameManager_OnGameStateChanged(GameState obj)
-    {
     }
 
     private void OnDestroy()
     {
         GameManager.OnGameStateChanged -= GameManager_OnGameStateChanged;
+    }
+
+    private void Start()
+    {
+        _rigidbody = this.GetComponent<Rigidbody>();
+    }
+
+    private void GameManager_OnGameStateChanged(GameState obj)
+    {
     }
 
     private void Update()

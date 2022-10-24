@@ -2,18 +2,38 @@ using System; // Required for:  public static event Action<>
 using System.Collections; // Required for IEnumerator Coroutines
 using UnityEngine;
 
+// == GLOBAL ENUM ==
+// Tarodev set up global enum BELOW the class
+// We have moved it to the top for readability
+// Check how best to index number and reconfigure enum indexing
+// EG Could index them 10, 20, 30 etc or even 100, 200, 300, etc
+// to give room to add new enums
+
+public enum GameState
+{
+    SetupLevel = 10,
+    StartLevel = 20,
+    PlayLevel = 30,
+    PauseLevel = 40,
+    ExitLevel = 50
+}
+
 public class GameManager : MonoBehaviour
 {
 
     public static GameManager Instance;
     public GameState _gameState;
 
-    private PlayerController _playerController;
+    // private PlayerController _playerController;
+    // REFACTORED as public static instance
 
     public static event Action<GameState> OnGameStateChanged;
 
     private int StartLevelDelaySecs = 1;
+    private int menuUIDelaySecs = 2;
     // private so we don't need to Reset GameManager every time we change it
+
+    [HideInInspector] public bool levelCompleted = false;
 
     private void Awake()
     {
@@ -29,11 +49,6 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        _playerController = FindObjectOfType<PlayerController>();
-
-        if (_playerController == null)
-        { Debug.Log("GameManager: Can't find PlayerController"); }
-        else { Debug.Log("GameManager: PlayerController locked and loaded"); }
 
         DisablePlayerMovement();
         Debug.Log("GameManager: PlayerController disabled");
@@ -76,11 +91,8 @@ public class GameManager : MonoBehaviour
             case GameState.PauseLevel:
                 HandlePauseLevel();
                 break;
-            case GameState.RestartLevel:
-                HandleRestartLevel();
-                break;
-            case GameState.CompleteLevel:
-                HandleCompleteLevel();
+            case GameState.ExitLevel:
+                HandleExitLevel();
                 break;
         }
         OnGameStateChanged?.Invoke(newGameState);
@@ -103,8 +115,9 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("GameManager: GameState = " + _gameState);
         EnablePlayerMovement();
+        Debug.Log("Player movement enabled");
 
-        // TO DO
+        // TO DO IN THIS STATE
         // In case we are coming out of Pause menu..
         // Set Time.deltaTime = 1f;
     }
@@ -113,52 +126,70 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("GameManager: GameState = " + _gameState);
         DisablePlayerMovement();
+        Debug.Log("Player movement disabled");
 
-        // TO DO
+        // TO DO IN THIS STATE
         // Set Time.deltaTime = 0f;
     }
 
-    private void HandleRestartLevel()
+    private void HandleExitLevel()
     {
         Debug.Log("GameManager: GameState = " + _gameState);
-        DisablePlayerMovement();
 
-        // TO DO
-        // On Restart Level activated:
-        // --PLAYER CTRL-- Disable player controller
-        // --MENU MGR-- Pause before activating RESTART screen
-        // --MENU MGR-- Show RESTART screen
-        // Click to
-        // (1) Retry (eg to beat high score) OR
-        // (2) Main Menu
-        // Hand back to MetaManager to destroy this level / scene
+        DisablePlayerMovement();
+        Debug.Log("Player movement disabled");
+
+        StartCoroutine(ExitActions());
     }
 
-    private void HandleCompleteLevel()
+    private IEnumerator ExitActions()
     {
-        Debug.Log("GameManager: GameState = " + _gameState);
-        DisablePlayerMovement();
+        // Stop doing stuff..
+        // Where should we trigger this? 
+        // Currently PlayerCollision but move to GameManager?? 
 
-        // TO DO
-        // On Complete Level activated:
         // --PLAYER CTRL-- Disable player controller
-        // --MENU MGR-- Pause before activating WIN screen
-        // --MENU MGR-- Show WIN screen
-        // Click to
-        // (1) Next Level OR 
-        // (2) Retry (eg to beat high score) OR
-        // (3) Main Menu
         // Hand back to MetaManager to destroy this level / scene
+
+        yield return StartCoroutine(Wait(menuUIDelaySecs));
+        Debug.Log("StartCoroutine(Wait(menuUIDelaySecs))");
+        // Feeding delay in seconds to Wait coroutine
+
+        if (levelCompleted == true)
+        {
+            MetaManager.Instance.ChangeMetaStateToCompleteLevel();
+        }
+        else
+        {
+            MetaManager.Instance.ChangeMetaStateToRestartLevel();
+        }
     }
 
     private void DisablePlayerMovement()
     {
-        _playerController.enabled = false;
+        PlayerController.Instance.enabled = false;
+        Debug.Log("PlayerController.Instance.enabled = " + PlayerController.Instance.enabled.ToString());
+
+        // Prevents multiple collisions eg with obstacles
+        // PlayerCollision.Instance.enabled = false;
+        // Debug.Log("PlayerCollision.Instance.enabled = " + PlayerController.Instance.enabled.ToString());
+
+        // _playerController.enabled = false;
+        // REFACTORED as public static PlayerController Instance
     }
 
     private void EnablePlayerMovement()
     {
-        _playerController.enabled = true;
+        PlayerController.Instance.enabled = true;
+        Debug.Log("PlayerController.Instance.enabled = " + PlayerController.Instance.enabled.ToString());
+
+        // _playerController.enabled = true;
+        // REFACTORED as public static PlayerController Instance
+
+        // Disabling prevents multiple collisions eg with obstacles
+        // As we are disabling it in the "Disable Player" we need to enable it too
+        // PlayerCollision.Instance.enabled = true;
+        // Debug.Log("PlayerCollision.Instance.enabled = " + PlayerController.Instance.enabled.ToString());
     }
 
     private IEnumerator Countdown()
@@ -172,7 +203,7 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator Wait(int delaySecs)
     {
-        Debug.Log("GameManager: Waiting started");
+        Debug.Log("IEnumerator Wait: Waiting started");
 
         for (int i = 0; i < delaySecs; i++)
         {
@@ -186,7 +217,7 @@ public class GameManager : MonoBehaviour
             // eg Coroutine: Disable PlayerController | Show tutorial text Wait until key pressed
         }
 
-        Debug.Log("GameManager: Waiting completed");
+        Debug.Log("IEnumerator Wait: Waiting completed");
     }
 
     public void UnpauseGame()
@@ -196,15 +227,6 @@ public class GameManager : MonoBehaviour
 
 }
 
-public enum GameState
-{
-    SetupLevel = 1,
-    StartLevel = 2,
-    PlayLevel = 3,
-    PauseLevel = 4,
-    RestartLevel = 5,
-    CompleteLevel = 6
-}
 
 
 
