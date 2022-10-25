@@ -133,7 +133,7 @@ public class MetaManager : MonoBehaviour
         UpdateCurrentSceneIndex();
 
         // THIS CHECK MUST BE BEFORE LOADSCENE
-        // Otherwise LoadingScreen will show up before QuitMenu
+        // Otherwise LoadingScreen will show up before Start & Quit Menus
         // Just let the loading screen show?
 
         if (Instance.sceneToLoad == Instance.mainMenuSceneIndex)
