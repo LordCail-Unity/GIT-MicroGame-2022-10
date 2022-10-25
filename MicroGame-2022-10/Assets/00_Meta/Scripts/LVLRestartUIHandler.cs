@@ -6,13 +6,13 @@ public class LVLRestartUIHandler : MonoBehaviour
     public void RestartLevel()
     {
         Debug.Log("Button: Replay");
-        MetaManager.Instance.LoadThisScene();
+        LevelManager.Instance.ReloadScene();
     }
 
     public void MainMenu()
     {
         Debug.Log("Button: Main Menu");
-        MetaManager.Instance.LoadMainMenuScene();
+        LevelManager.Instance.LoadMainMenu();
     }
 
 }

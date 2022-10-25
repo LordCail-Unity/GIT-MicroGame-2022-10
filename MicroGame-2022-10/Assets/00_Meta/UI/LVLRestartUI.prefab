@@ -757,7 +757,7 @@ GameObject:
   - component: {fileID: 4751666870714683809}
   - component: {fileID: 7243116626588757794}
   m_Layer: 5
-  m_Name: LVLLoseUI
+  m_Name: LVLRestartUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

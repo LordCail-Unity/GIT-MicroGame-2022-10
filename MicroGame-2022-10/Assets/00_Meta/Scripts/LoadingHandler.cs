@@ -1,134 +1,113 @@
 using System.Collections; // Required for IEnumerator
-// using System.Threading.Tasks; // Required for Task.Delay used in Async methods
-// DON'T USE ASYNC METHOD TYPE AS IT IS INCOMPATIBLE WITH WEBGL
 using UnityEngine;
-using UnityEngine.UI; // Required for access to Slider objects
 using UnityEngine.SceneManagement; // Required for Load Scene
 
 public class LoadingHandler : MonoBehaviour
 {
-    // MetaManager is a global static instance so don't need this:
-    // private MetaManager _metaManager;
 
-    // To call methods simply use MetaManager.Instance.xyzmethod(); 
-    // To call variables simply use MetaManager.Instance.xyzvariable; 
+    public static LoadingHandler Instance;
+    // Public because accessed by LevelManager 
 
-    [SerializeField] private Slider _loadingSlider;
-    [SerializeField] private TMPro.TMP_Text _loadingPercentText;
+    [HideInInspector] public float loadingProgress;
+    // Public because accessed by LoadingUIHandler
 
-    private int sceneIndexToLoad;
-
-    private float loadingUIDelaySecs = .05f; 
-    // Loading screen is too fast to see so tiny delay.
+    [HideInInspector] public bool loadingScreenComplete = false;
 
     private void Awake()
     {
-        Debug.Log("LoadingHandler.Awake");
-        // MetaManager is a global static instance so don't need this:
-        //_metaManager = FindObjectOfType<MetaManager>();
-
-        // To call methods simply use MetaManager.Instance.xyzmethod(); 
-        // To call variables simply use MetaManager.Instance.xyzvariable; 
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
-    private void OnEnable()
+    public void StartAsyncLoadCoroutine(int sceneIndexToLoad, bool activateLoadingUI)
     {
-        // !!IMPORTANT!!
-        // While Start will only ever be called once after creation,
-        // On Enable is called every time the script component,
-        // or the object it's attached to, is enabled.
-        // This is essential here as we are not destroying and creating LoadingHandler,
-        // we are Enabling and Disabling it as required.
+        Debug.Log("LoadingHandler.StartAsyncLoadCoroutine");
+        Debug.Log("ActivateLoadingUI = " + activateLoadingUI.ToString());
 
-        Debug.Log("LoadingHandler.OnEnable");
-        GetSceneToLoad();
-        StartAsyncLoadCoroutine();
-
-        //OnEnable called BEFORE Start
+        if (activateLoadingUI == false)
+        { loadingScreenComplete = true; }
+        else { loadingScreenComplete = false; }
+        
+        StartCoroutine(AsyncLoad(sceneIndexToLoad));
     }
 
-    private void Start()
-    {
-    }
-
-    private void GetSceneToLoad()
-    {
-        sceneIndexToLoad = MetaManager.Instance.sceneToLoad;
-        Debug.Log("LoadingHandler: GetSceneToLoad = " + sceneIndexToLoad);
-    }
-
-    public void StartAsyncLoadCoroutine()
-    {
-        Debug.Log("LoadingHandler: StartAsyncLoadCoroutine");
-        StartCoroutine(AsyncLoad(sceneIndexToLoad, loadingUIDelaySecs));
-    }
-
-    private void UpdateSlider(float progressPercent)
-    {
-        _loadingSlider.value = progressPercent;
-        _loadingPercentText.text = Mathf.Round(progressPercent * 100f) + "%";
-        // Debug.Log("UpdateSlider: " + _loadingPercentText.text);
-    }
-
-    IEnumerator AsyncLoad(int sceneIndex, float delaySecs)
+    IEnumerator AsyncLoad(int sceneIndex)
     {
         Debug.Log("LoadingHandler: AsyncLoad started");
 
-        yield return new WaitForSecondsRealtime(delaySecs);
-
-
-        AsyncOperation _asyncOperation = SceneManager.LoadSceneAsync(sceneIndex); // Can use sceneIndex OR sceneName
-        // OPTIONAL: LoadSceneAsync(sceneIndex, LoadSceneMode.Additive)
+        AsyncOperation _asyncOperation = SceneManager.LoadSceneAsync(sceneIndex);
+        Debug.Log("_asyncOperation Started: sceneIndex = " + sceneIndex);
 
         _asyncOperation.allowSceneActivation = false;
 
-        //Debug.Log("_asyncOperation Started: sceneIndex = " + sceneIndex);
-
-        float sliderPercent = 0f;
-
         while (!_asyncOperation.isDone)
         {
-            yield return new WaitForSecondsRealtime(delaySecs);
-            //Debug.Log("WhileLoop1 Waited for: " + delaySecs);
+            loadingProgress = _asyncOperation.progress;
 
-            if (sliderPercent <= _asyncOperation.progress)
-            { sliderPercent = sliderPercent + .05f; }
-            //Debug.Log("sliderPercent:" + sliderPercent * 100 + "%");
-            UpdateSlider(sliderPercent);
-
-            _asyncOperation.allowSceneActivation = true;
-            Debug.Log("_asyncOperation: SceneActivated = " + sceneIndex);
+            // Check if the Operation has finished
+            // AND LoadingScreen is complete
+            if (_asyncOperation.progress >= 0.9f && loadingScreenComplete == true)
+            {
+                //Activate the Scene
+                _asyncOperation.allowSceneActivation = true;
+            }
+            yield return null;
         }
 
-        // One frame delay to allow SceneActivation to kick in before moving to next action
-        yield return null;
-
-        Debug.Log("_asyncOperation Completed: sceneIndex = " + sceneIndex);
+        Debug.Log("_asyncOperation.isDone: sceneIndex = " + sceneIndex);
         //Debug.Log("_asyncOperation sliderPercent:" + sliderPercent * 100 + "%");
 
-        while (sliderPercent <= 1f)
-        {
-            sliderPercent = sliderPercent + 0.05f;
-            // |SAME AS| loadPercent += 0.05f;
-            UpdateSlider(sliderPercent);
-
-            yield return new WaitForSecondsRealtime(delaySecs);
-            //Debug.Log("WhileLoop2 Waited for: " + delaySecs);
-        }
-
-        Debug.Log("SliderUpdate Completed:" + sliderPercent * 100 + "%");
-        //Debug.Log("Final sliderPercent:" + sliderPercent * 100 + "%");
-
-        yield return new WaitForSecondsRealtime(delaySecs);
-
-        MetaManager.Instance.ChangeMetaStateToGameManager();
-
+        LevelManager.Instance.loadingComplete();
     }
 
 }
 
 
+
 // ==NOTES==
+
+// using System.Threading.Tasks; // Required for Task.Delay used in Async methods
+// DON'T USE "PUBLIC VOID ASYNC" METHOD TYPE AS IT IS INCOMPATIBLE WITH WEBGL
+// DO USE Coroutines: "IENUMERATOR" method instead
+
+
+// ONENABLE stuff below only applies to the LoadingUI which is activated on State change
+// NOT the LoadingHandler which is permanently active under MetaManager
+
+// !!IMPORTANT!!
+// While Start will only ever be called once after creation,
+// On Enable is called every time the script component,
+// or the object it's attached to, is enabled.
+// This is essential here as we are not destroying and creating LoadingHandler,
+// we are Enabling and Disabling it as required.
+
+//private void OnEnable()
+//{
+//    Debug.Log("LoadingHandler.OnEnable");
+//    GetSceneToLoad();
+//    StartAsyncLoadCoroutine();
+//}
+
+// Can use LoadSceneAsync(sceneIndex) OR sceneName
+// OPTIONAL: LoadSceneAsync(sceneIndex, LoadSceneMode.Additive)
+
+
+// Need to figure out how to wait for the loading screen slider to finish BEFORE activating scene
+// IF we are loading a Game Scene and using the loading screen slider
+
+
+// MetaManager is a global static instance so don't need this:
+// private MetaManager _metaManager;
+
+// To call methods simply use MetaManager.Instance.xyzmethod(); 
+// To call variables simply use MetaManager.Instance.xyzvariable; 
+
 
 // GameManager gets activated as soon as the scene is loaded
 // This activates the GameUI which is overlaying the LoadingUI 

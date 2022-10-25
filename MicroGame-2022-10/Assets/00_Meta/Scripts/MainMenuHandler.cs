@@ -7,7 +7,6 @@ public class MainMenuHandler : MonoBehaviour
     [HideInInspector] private int highScore = 0;
     [SerializeField] private TextMeshProUGUI highScoreText;
 
-
     private void OnEnable()
     {
         highScore = PlayerPrefs.GetInt("SavedHighScore", highScore);
@@ -27,6 +26,12 @@ public class MainMenuHandler : MonoBehaviour
         PlayerPrefs.DeleteKey("SavedHighScore");
         highScore = 0;
         UpdateHighScoreText();
+    }
+
+    public void PlayButton()
+    {
+        Debug.Log("Button: Play");
+        LevelManager.Instance.LoadSceneByIndex(0);
     }
 
     //[OPTIONAL]

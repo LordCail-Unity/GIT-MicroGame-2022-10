@@ -11,8 +11,8 @@ public class MetaUI : MonoBehaviour
 
     [SerializeField] private GameObject MainMenuUI;
     [SerializeField] private GameObject LoadingScreenUI;
-    [SerializeField] private GameObject LVLLoseUI;
-    [SerializeField] private GameObject LVLWinUI;
+    [SerializeField] private GameObject LVLRestartUI;
+    [SerializeField] private GameObject LVLCompleteUI;
     [SerializeField] private GameObject QuitMenuUI;
 
     private void Awake()
@@ -46,19 +46,16 @@ public class MetaUI : MonoBehaviour
         // ResetUI();
 
         MainMenuUI.SetActive(state == MetaState.MainMenu);
-        Debug.Log("MetaUI: MainMenu state: " + (state == MetaState.MainMenu).ToString());
-
-        LoadingScreenUI.SetActive(state == MetaState.LoadScene);
-        Debug.Log("MetaUI: LoadScene state: " + (state == MetaState.LoadScene).ToString());
-
-        LVLLoseUI.SetActive(state == MetaState.LevelRestart);
-        Debug.Log("MetaUI: LevelLose state: " + (state == MetaState.LevelRestart).ToString());
-
-        LVLWinUI.SetActive(state == MetaState.LevelComplete);
-        Debug.Log("MetaUI: LevelWin state: " + (state == MetaState.LevelComplete).ToString());
-
+        LoadingScreenUI.SetActive(state == MetaState.LoadGameScene);
+        LVLRestartUI.SetActive(state == MetaState.LevelRestart);
+        LVLCompleteUI.SetActive(state == MetaState.LevelComplete);
         QuitMenuUI.SetActive(state == MetaState.QuitMenu);
-        Debug.Log("MetaUI: QuitMenu state: " + (state == MetaState.QuitMenu).ToString());
+
+        //Debug.Log("MetaUI: MainMenu state: " + (state == MetaState.MainMenu).ToString());
+        //Debug.Log("MetaUI: LoadScene state: " + (state == MetaState.LoadGameScene).ToString());
+        //Debug.Log("MetaUI: LevelRestart state: " + (state == MetaState.LevelRestart).ToString());
+        //Debug.Log("MetaUI: LevelComplete state: " + (state == MetaState.LevelComplete).ToString());
+        //Debug.Log("MetaUI: QuitMenu state: " + (state == MetaState.QuitMenu).ToString());
 
     }
 

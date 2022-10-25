@@ -6,13 +6,13 @@ public class QuitUIHandler : MonoBehaviour
     public void QuitApp()
     {
         Debug.Log("Button: Quit");
-        MetaManager.Instance.ChangeMetaStateToQuitApp();
+        LevelManager.Instance.QuitApp();
     }
 
     public void MainMenu()
     {
         Debug.Log("Button: Main Menu");
-        MetaManager.Instance.LoadMainMenuScene();
+        LevelManager.Instance.LoadMainMenu();
     }
     
 }

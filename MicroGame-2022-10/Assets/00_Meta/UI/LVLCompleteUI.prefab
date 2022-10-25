@@ -548,7 +548,7 @@ GameObject:
   - component: {fileID: 1812853641498745678}
   - component: {fileID: 4552389515323764519}
   m_Layer: 5
-  m_Name: LVLWinUI
+  m_Name: LVLCompleteUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
