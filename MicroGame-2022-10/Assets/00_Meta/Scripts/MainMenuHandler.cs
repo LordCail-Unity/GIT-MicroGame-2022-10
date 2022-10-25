@@ -7,30 +7,34 @@ public class MainMenuHandler : MonoBehaviour
     [HideInInspector] private int highScore = 0;
     [SerializeField] private TextMeshProUGUI highScoreText;
 
-    private void Start()
+
+    private void OnEnable()
     {
         highScore = PlayerPrefs.GetInt("SavedHighScore", highScore);
+        Debug.Log("Retrieved High Score: " + highScore);
+
         // Get highScore from the saved data or set to default 0
-        UpdateScoreText();
+        UpdateHighScoreText();
     }
 
-    private void UpdateScoreText()
+    private void UpdateHighScoreText()
     {
         highScoreText.text = highScore.ToString();
-        highScore = 0;
-        UpdateScoreText();
     }
 
     public void ResetHighScore()
     {
         PlayerPrefs.DeleteKey("SavedHighScore");
+        highScore = 0;
+        UpdateHighScoreText();
     }
 
-    public void ResetPlayerPrefs()
-    {
-        //[OPTIONAL]
-        PlayerPrefs.DeleteAll(); // Delete ALL saved PlayerPrefs data
-    }
+    //[OPTIONAL]
+    //public void ResetPlayerPrefs()
+    //{
+
+    //    PlayerPrefs.DeleteAll(); // Delete ALL saved PlayerPrefs data
+    //}
 
 
 }

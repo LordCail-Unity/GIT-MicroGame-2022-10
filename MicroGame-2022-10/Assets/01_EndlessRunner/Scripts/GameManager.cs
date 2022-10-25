@@ -157,11 +157,11 @@ public class GameManager : MonoBehaviour
 
         if (levelCompleted == true)
         {
-            MetaManager.Instance.ChangeMetaStateToCompleteLevel();
+            MetaManager.Instance.ChangeMetaStateToLevelWin();
         }
         else
         {
-            MetaManager.Instance.ChangeMetaStateToRestartLevel();
+            MetaManager.Instance.ChangeMetaStateToLevelLose();
         }
     }
 

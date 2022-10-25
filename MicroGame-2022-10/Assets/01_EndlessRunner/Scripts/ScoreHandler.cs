@@ -32,6 +32,11 @@ public class ScoreHandler : MonoBehaviour
         UpdateScore();
     }
 
+    void OnDisable()
+    {
+        PlayerPrefs.SetInt("SavedHighScore", highScore);
+    }
+
     private void UpdateScore()
     {
         GetScore();
@@ -48,14 +53,14 @@ public class ScoreHandler : MonoBehaviour
 
     private void CheckHighScore()
     {
+        //Live HighScore Display check 
+        // Keep in Update
         if(score > highScore)
         {
             highScore = score;
-            
-            // MOVE SAVE FROM UPDATE
-            // TO AN EXIT LEVEL FUNCTION
-            // EG WITH SCRIPTABLE OBJECTS
-            SaveHighScore();
+
+            // MOVED SAVE METHOD FROM UPDATE
+            // TO THE OnDisable LEVEL FUNCTION
         }
     }
 
@@ -70,6 +75,7 @@ public class ScoreHandler : MonoBehaviour
         highScoreText.text = highScore.ToString();
     }
 
-    // ADD A BUTTON TO MENU TO RESET HIGH SCORE
+    // MainMenuHandler has BUTTON TO RESET HIGH SCORE
+
 
 }

@@ -17,8 +17,8 @@ public enum MetaState
     MainMenu = 20,
     LoadScene = 30,
     GameManager = 40,
-    RestartLevel = 50,
-    CompleteLevel = 60,
+    LevelLose = 50,
+    LevelWin = 60,
     QuitMenu = 70,
     QuitApp = 80
 }
@@ -87,11 +87,11 @@ public class MetaManager : MonoBehaviour
             case MetaState.GameManager:
                 HandleGameManager();
                 break;
-            case MetaState.RestartLevel:
-                HandleRestartLevel();
+            case MetaState.LevelLose:
+                HandleLevelLose();
                 break;
-            case MetaState.CompleteLevel:
-                HandleCompleteLevel();
+            case MetaState.LevelWin:
+                HandleLevelWin();
                 break;
             case MetaState.QuitMenu:
                 HandleQuitMenu();
@@ -131,6 +131,7 @@ public class MetaManager : MonoBehaviour
     {
         // Check conditions to switch MetaState 
         // If all conditions are met, change the MetaState
+        Debug.Log("MetaManager.ChangeMetaStateToLoadScene");
 
         UpdateCurrentSceneIndex();
 
@@ -169,6 +170,8 @@ public class MetaManager : MonoBehaviour
     {
         // Check conditions to switch MetaState 
         // If all conditions are met, change the MetaState
+        Debug.Log("MetaManager.ChangeMetaStateToGameManager");
+
         UpdateCurrentSceneIndex();
         UpdateMetaState(MetaState.GameManager);
     }
@@ -185,13 +188,13 @@ public class MetaManager : MonoBehaviour
         GameManager.Instance.UpdateGameState(GameState.StartLevel);
     }
 
-    public void ChangeMetaStateToRestartLevel()
+    public void ChangeMetaStateToLevelLose()
     {
-        Debug.Log("MetaManager.ChangeMetaStateToRestartLevel");
-        UpdateMetaState(MetaState.RestartLevel);
+        Debug.Log("MetaManager.ChangeMetaStateToLevelLose");
+        UpdateMetaState(MetaState.LevelLose);
     }
 
-    private void HandleRestartLevel()
+    private void HandleLevelLose()
     {
         // MOVE THIS STATE TO META MANAGER?
 
@@ -208,12 +211,13 @@ public class MetaManager : MonoBehaviour
         // (2) Main Menu
     }
 
-    public void ChangeMetaStateToCompleteLevel()
+    public void ChangeMetaStateToLevelWin()
     {
-        UpdateMetaState(MetaState.CompleteLevel);
+        Debug.Log("MetaManager.ChangeMetaStateToLevelWin");
+        UpdateMetaState(MetaState.LevelWin);
     }
 
-    private void HandleCompleteLevel()
+    private void HandleLevelWin()
     {
         // MOVE THIS STATE TO META MANAGER?
 
@@ -237,6 +241,7 @@ public class MetaManager : MonoBehaviour
     {
         // Check conditions to switch MetaState 
         // If all conditions are met, change the MetaState
+        Debug.Log("MetaManager.ChangeMetaStateToQuitMenu");
         UpdateMetaState(MetaState.QuitMenu);
     }
 
@@ -249,6 +254,7 @@ public class MetaManager : MonoBehaviour
     {
         // Check conditions to switch MetaState 
         // If all conditions are met, change the MetaState
+        Debug.Log("MetaManager.ChangeMetaStateToQuitApp");
         UpdateMetaState(MetaState.QuitApp);
     }
 

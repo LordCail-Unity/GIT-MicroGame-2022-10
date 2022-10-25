@@ -54,10 +54,12 @@ public class LoadingHandler : MonoBehaviour
     private void GetSceneToLoad()
     {
         sceneIndexToLoad = MetaManager.Instance.sceneToLoad;
+        Debug.Log("LoadingHandler: GetSceneToLoad = " + sceneIndexToLoad);
     }
 
     public void StartAsyncLoadCoroutine()
     {
+        Debug.Log("LoadingHandler: StartAsyncLoadCoroutine");
         StartCoroutine(AsyncLoad(sceneIndexToLoad, loadingUIDelaySecs));
     }
 
@@ -65,11 +67,12 @@ public class LoadingHandler : MonoBehaviour
     {
         _loadingSlider.value = progressPercent;
         _loadingPercentText.text = Mathf.Round(progressPercent * 100f) + "%";
-        Debug.Log("UpdateSlider: " + _loadingPercentText.text);
+        // Debug.Log("UpdateSlider: " + _loadingPercentText.text);
     }
 
     IEnumerator AsyncLoad(int sceneIndex, float delaySecs)
     {
+        Debug.Log("LoadingHandler: AsyncLoad started");
 
         yield return new WaitForSecondsRealtime(delaySecs);
 
@@ -79,29 +82,29 @@ public class LoadingHandler : MonoBehaviour
 
         _asyncOperation.allowSceneActivation = false;
 
-        Debug.Log("_asyncOperation Started: sceneIndex = " + sceneIndex);
+        //Debug.Log("_asyncOperation Started: sceneIndex = " + sceneIndex);
 
         float sliderPercent = 0f;
 
         while (!_asyncOperation.isDone)
         {
             yield return new WaitForSecondsRealtime(delaySecs);
-            Debug.Log("WhileLoop1 Waited for: " + delaySecs);
+            //Debug.Log("WhileLoop1 Waited for: " + delaySecs);
 
             if (sliderPercent <= _asyncOperation.progress)
             { sliderPercent = sliderPercent + .05f; }
-            Debug.Log("sliderPercent:" + sliderPercent * 100 + "%");
+            //Debug.Log("sliderPercent:" + sliderPercent * 100 + "%");
             UpdateSlider(sliderPercent);
 
             _asyncOperation.allowSceneActivation = true;
-            Debug.Log("allowSceneActivation Completed: SceneActivated = " + sceneIndex);
+            Debug.Log("_asyncOperation: SceneActivated = " + sceneIndex);
         }
 
         // One frame delay to allow SceneActivation to kick in before moving to next action
         yield return null;
 
         Debug.Log("_asyncOperation Completed: sceneIndex = " + sceneIndex);
-        Debug.Log("_asyncOperation sliderPercent:" + sliderPercent * 100 + "%");
+        //Debug.Log("_asyncOperation sliderPercent:" + sliderPercent * 100 + "%");
 
         while (sliderPercent <= 1f)
         {
@@ -110,11 +113,11 @@ public class LoadingHandler : MonoBehaviour
             UpdateSlider(sliderPercent);
 
             yield return new WaitForSecondsRealtime(delaySecs);
-            Debug.Log("WhileLoop2 Waited for: " + delaySecs);
+            //Debug.Log("WhileLoop2 Waited for: " + delaySecs);
         }
 
         Debug.Log("SliderUpdate Completed:" + sliderPercent * 100 + "%");
-        Debug.Log("Final sliderPercent:" + sliderPercent * 100 + "%");
+        //Debug.Log("Final sliderPercent:" + sliderPercent * 100 + "%");
 
         yield return new WaitForSecondsRealtime(delaySecs);
 
