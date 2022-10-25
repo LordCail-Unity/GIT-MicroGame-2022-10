@@ -157,11 +157,16 @@ public class GameManager : MonoBehaviour
 
         if (levelCompleted == true)
         {
-            MetaManager.Instance.ChangeMetaStateToCompleteLevel();
+            //Bring back to GameManager?
+            Debug.Log("GameManager.LevelCompleted = " + levelCompleted.ToString());
+            LevelManager.Instance.isThisLevelCompleted = true;
+            LevelManager.Instance.UpdateMaxLevelCompleted();
+            MetaManager.Instance.UpdateMetaState(MetaState.LevelComplete);
         }
         else
         {
-            MetaManager.Instance.ChangeMetaStateToRestartLevel();
+            //Bring back to GameManager?
+            MetaManager.Instance.UpdateMetaState(MetaState.LevelRestart);
         }
     }
 

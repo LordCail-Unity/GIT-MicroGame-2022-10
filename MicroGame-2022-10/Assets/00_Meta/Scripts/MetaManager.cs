@@ -1,24 +1,14 @@
-using System; // Required for..  public static event Action<>
-// using System.Collections; // Required for IEnumerator Coroutines but not currently using
+using System; // Required for: public static event Action<>
 using UnityEngine;
-using UnityEngine.SceneManagement;
-
-
-// == GLOBAL ENUM ==
-// Tarodev set up global enum BELOW the class
-// We have moved it to the top for readability
-// Check how best to index number and reconfigure enum indexing
-// EG Could index them 10, 20, 30 etc or even 100, 200, 300, etc
-// to give room to add new enums
 
 public enum MetaState
 {
     SetupApp = 10,
-    MainMenu = 20,
-    LoadScene = 30,
-    GameManager = 40,
-    RestartLevel = 50,
-    CompleteLevel = 60,
+    MainMenu = 20, 
+    LoadGameScene = 30,
+    GameManager = 40, 
+    LevelRestart = 50, 
+    LevelComplete = 60,
     QuitMenu = 70,
     QuitApp = 80
 }
@@ -29,23 +19,7 @@ public class MetaManager : MonoBehaviour
     public static MetaManager Instance;
     public MetaState _metaState;
 
-    // GameManager is a global static instance so don't need this:
-    // private GameManager _gameManager;
-
     public static event Action<MetaState> OnMetaStateChanged;
-
-    public int mainMenuSceneIndex = 0; 
-    public int firstSceneIndex = 1;
-
-    // Moved to LoadingHandler
-    // public float loadingUIDelaySecs = 0.1f;
-    
-    [HideInInspector] public int currentSceneIndex = 0;
-    [HideInInspector] public int finalSceneIndex;
-    [HideInInspector] public int sceneToLoad = 1;
-
-    // Removed. Use SceneActivation instead:
-    // [HideInInspector] public bool LoadingComplete; 
 
     private void Awake()
     {
@@ -53,20 +27,17 @@ public class MetaManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            UpdateMetaState(MetaState.SetupApp);
         }
         else
         {
             Destroy(gameObject);
         }
-
-        UpdateMetaState(MetaState.SetupApp);
     }
 
     private void Start()
     {
-        ChangeMetaStateToMainMenu();
-        Instance.finalSceneIndex = SceneManager.sceneCountInBuildSettings - 1;
-        Debug.Log("MetaMgr: finalSceneIndex = " + Instance.finalSceneIndex);
+        UpdateMetaState(MetaState.MainMenu);
     }
 
     public void UpdateMetaState(MetaState newMetaState)
@@ -81,17 +52,17 @@ public class MetaManager : MonoBehaviour
             case MetaState.MainMenu:
                 HandleMainMenu(); 
                 break;
-            case MetaState.LoadScene:
+            case MetaState.LoadGameScene:
                 HandleLoadScene();
                 break;
             case MetaState.GameManager:
                 HandleGameManager();
                 break;
-            case MetaState.RestartLevel:
-                HandleRestartLevel();
+            case MetaState.LevelRestart:
+                HandleLevelRestart();
                 break;
-            case MetaState.CompleteLevel:
-                HandleCompleteLevel();
+            case MetaState.LevelComplete:
+                HandleLevelComplete();
                 break;
             case MetaState.QuitMenu:
                 HandleQuitMenu();
@@ -110,67 +81,14 @@ public class MetaManager : MonoBehaviour
         Debug.Log("MetaManager: MetaState = " + _metaState);
     }
 
-    public void ChangeMetaStateToMainMenu()
-    {
-        UpdateMetaState(MetaState.MainMenu);
-    }
-
     private void HandleMainMenu()
-    {
-        // Figure out how to load MainMenu scene without stuffing 
-        // everything up..
-        
+    {     
         Debug.Log("MetaManager: MetaState = " + _metaState);
-
-        UpdateCurrentSceneIndex();
-        Instance.sceneToLoad = firstSceneIndex;
-        Debug.Log("MetaMgr: sceneToLoad = " + Instance.sceneToLoad);
-    }
-
-    public void ChangeMetaStateToLoadScene()
-    {
-        // Check conditions to switch MetaState 
-        // If all conditions are met, change the MetaState
-
-        UpdateCurrentSceneIndex();
-
-        // ASYNC LOAD MAIN MENU??
-        // Doesn't work as it loads up the MetaManager again..
-
-        // ASYNC UNLOAD CURRENT SCENE??
-        // Doesn't work without Additive Loading as you cannot unload the only scene you have open
-        // Change our Async loading to Additive mode and always have Scene 0 open?
-        // Then we could take Main Menu out of DDOL mode
-
-        // THIS CHECK MUST BE BEFORE LOADSCENE
-        // Otherwise LoadingScreen will show up before QuitMenu
-        // Just let the loading screen show?
-
-        if (Instance.sceneToLoad == Instance.finalSceneIndex)
-        {
-            SceneManager.LoadSceneAsync(Instance.finalSceneIndex);
-            UpdateMetaState(MetaState.QuitMenu);
-        }
-        else
-        {
-            UpdateMetaState(MetaState.LoadScene);
-        }
     }
 
     private void HandleLoadScene()
     {
         Debug.Log("MetaManager: MetaState = " + _metaState);
-
-        Debug.Log("HandleLoadScene: Current Scene = " + Instance.currentSceneIndex);
-        Debug.Log("HandleLoadScene: SceneToLoad = " + Instance.sceneToLoad);
-    }
-
-    public void ChangeMetaStateToGameManager()
-    {
-        // Check conditions to switch MetaState 
-        // If all conditions are met, change the MetaState
-        UpdateCurrentSceneIndex();
-        UpdateMetaState(MetaState.GameManager);
     }
 
     private void HandleGameManager()
@@ -178,78 +96,24 @@ public class MetaManager : MonoBehaviour
         Debug.Log("MetaManager: MetaState = " + _metaState);
         Debug.Log("MetaManager: Hand over to GameManager");
 
-        // GameManager is a global static instance so don't need this:
-        // _gameManager = FindObjectOfType<GameManager>();
-        // _gameManager.UpdateGameState(GameState.StartLevel);
-
         GameManager.Instance.UpdateGameState(GameState.StartLevel);
     }
 
-    public void ChangeMetaStateToRestartLevel()
+    private void HandleLevelRestart()
     {
-        Debug.Log("MetaManager.ChangeMetaStateToRestartLevel");
-        UpdateMetaState(MetaState.RestartLevel);
-    }
-
-    private void HandleRestartLevel()
-    {
-        // MOVE THIS STATE TO META MANAGER?
-
+        // MOVE THIS STATE & UI BACK TO GAME MANAGER?
         Debug.Log("MetaManager: MetaState = " + _metaState);
-
-        LoadThisScene();
-
-        // TO DO IN THIS STATE
-        // On Restart Level activated:
-        // --MENU MGR-- Pause before activating RESTART screen
-        // --MENU MGR-- Show RESTART screen
-        // Click to
-        // (1) Retry (eg to beat high score) OR
-        // (2) Main Menu
     }
 
-    public void ChangeMetaStateToCompleteLevel()
+    private void HandleLevelComplete()
     {
-        UpdateMetaState(MetaState.CompleteLevel);
-    }
-
-    private void HandleCompleteLevel()
-    {
-        // MOVE THIS STATE TO META MANAGER?
-
+        // MOVE THIS STATE & UI BACK TO GAME MANAGER?
         Debug.Log("MetaManager: MetaState = " + _metaState);
-
-        LoadNextScene();
-
-        // TO DO IN THIS STATE
-        // On Complete Level activated:
-        // --PLAYER CTRL-- Disable player controller
-        // --MENU MGR-- Pause before activating WIN screen
-        // --MENU MGR-- Show WIN screen
-        // Click to
-        // (1) Next Level OR 
-        // (2) Retry (eg to beat high score) OR
-        // (3) Main Menu
-        // Hand back to MetaManager to destroy this level / scene
-    }
-
-    public void ChangeMetaStateToQuitMenu()
-    {
-        // Check conditions to switch MetaState 
-        // If all conditions are met, change the MetaState
-        UpdateMetaState(MetaState.QuitMenu);
     }
 
     private void HandleQuitMenu()
     {
         Debug.Log("MetaManager: MetaState = " + _metaState);
-    }
-
-    public void ChangeMetaStateToQuitApp()
-    {
-        // Check conditions to switch MetaState 
-        // If all conditions are met, change the MetaState
-        UpdateMetaState(MetaState.QuitApp);
     }
 
     private void HandleQuitApplication()
@@ -259,64 +123,110 @@ public class MetaManager : MonoBehaviour
         Debug.Log("QUIT APPLICATION");
     }
 
-    // REFACTOR ALL BELOW INTO
-    //
-    // >> MetaUI = Possible
-    // >> New MetaUI sub-component = better eg new MetaUIButtonHandler
-    // >> LoadingHandler = NOT possible(?)
-    // CANNOT be called by LoadingHandler because this sequence ENABLES LoadingHandler
-    // when MetaUI enables LoadingScreenUI
-
-    public void UpdateCurrentSceneIndex()
-    {
-        Instance.currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        Debug.Log("MetaManager: newCurrentSceneIndex = " + Instance.currentSceneIndex);
-    }
-
-    public void LoadMainMenuScene()
-    {
-        Debug.Log("MetaManager.LoadMainMenuScene");
-
-        Instance.sceneToLoad = Instance.mainMenuSceneIndex;
-
-        ChangeMetaStateToLoadScene();
-        // From other classes call this using:
-        // MetaManager.Instance.ChangeMetaStateToLoadScene();
-    }
-
-    public void LoadThisScene()
-    {
-        Debug.Log("MetaManager.LoadThisScene");
-
-        Instance.sceneToLoad = Instance.currentSceneIndex;
-        
-        ChangeMetaStateToLoadScene();
-        // From other classes call this using:
-        // MetaManager.Instance.ChangeMetaStateToLoadScene();
-    }
-
-    public void LoadNextScene()
-    {
-        Debug.Log("MetaManager.LoadNextScene");
-        
-        Instance.sceneToLoad = Instance.currentSceneIndex + 1;
-        
-        ChangeMetaStateToLoadScene();
-        // From other classes call this using:
-        // MetaManager.Instance.ChangeMetaStateToLoadScene();
-    }
-
-    public void QuitApp()
-    {
-        ChangeMetaStateToQuitApp();
-    }
-
 }
 
 
 
 
 // ==NOTES==
+
+//using System; // Required for..  public static event Action<>
+//// using System.Collections; // Required for IEnumerator Coroutines but not currently using
+//using UnityEngine;
+//using UnityEngine.SceneManagement;
+
+
+
+// == GLOBAL ENUM ==
+// Tarodev set up global enum BELOW the class
+// We have moved it to the top for readability
+// Check how best to index number and reconfigure enum indexing
+// EG Could index them 10, 20, 30 etc (or even 100, 200, 300, etc)
+// to give room to add new enums (depending on how many you might need)
+
+
+//public enum MetaState
+//{
+//    SetupApp = 10,
+//    MainMenu = 20,
+//    LoadGameScene = 30, // Hand over to LoadingHandler
+//    GameManager = 40, // Hand over to GameManager to manage the Level Gameplay
+//    LevelRestart = 50, // Currently for Lose Game but could also be triggered mid-game from Pause Menu
+//    LevelComplete = 60, // Currently On Win; Could also trigger Save functions
+//    QuitMenu = 70,
+//    QuitApp = 80
+//}
+
+
+
+// NOTE RE MetaStateToXYZ()
+// Having methods solely to update MetaState is basically redundant BUT
+// it might help to ensure we know who is changing the MetaState
+// (ie ONLY MetaManager) and also enables us to add state change checks 
+
+
+// GameManager & LevelHandler are global static instances so don't need this:
+// private GameManager _gameManager; 
+// private LeveHandler _levelHandler; 
+
+// GameManager is a global static instance so don't need this:
+// _gameManager = FindObjectOfType<GameManager>();
+// _gameManager.UpdateGameState(GameState.StartLevel);
+
+
+// Moved to LevelHandler
+//public int mainMenuSceneIndex = 0; 
+//public int firstSceneIndex = 1;
+//[HideInInspector] public int currentSceneIndex = 0;
+//[HideInInspector] public int finalSceneIndex;
+//[HideInInspector] public int sceneToLoad = 1;
+// START
+//Instance.finalSceneIndex = SceneManager.sceneCountInBuildSettings - 1;
+//Debug.Log("MetaMgr: finalSceneIndex = " + Instance.finalSceneIndex);
+
+//Instance.sceneToLoad = firstSceneIndex;
+//Debug.Log("MetaMgr: sceneToLoad = " + Instance.sceneToLoad);
+
+// MOVED TO LEVELHANDLER
+//
+//public void LoadMainMenuScene()
+//{
+//    Debug.Log("MetaManager.LoadMainMenuScene");
+
+//    Instance.sceneToLoad = Instance.mainMenuSceneIndex;
+//    Debug.Log("Instance.sceneToLoad = " + Instance.sceneToLoad.ToString());
+
+//    ChangeMetaStateToLoadScene();
+//    // From other classes call this using:
+//    // MetaManager.Instance.ChangeMetaStateToLoadScene();
+//}
+
+// MOVED TO LEVELHANDLER
+//
+//public void LoadThisScene()
+//{
+//    Debug.Log("MetaManager.LoadThisScene");
+
+//    Instance.sceneToLoad = Instance.currentSceneIndex;
+
+//    ChangeMetaStateToLoadScene();
+//    // From other classes call this using:
+//    // MetaManager.Instance.ChangeMetaStateToLoadScene();
+//}
+
+// MOVED TO LEVELHANDLER
+//
+//public void LoadNextScene()
+//{
+//    Debug.Log("MetaManager.LoadNextScene");
+
+//    Instance.sceneToLoad = Instance.currentSceneIndex + 1;
+
+//    ChangeMetaStateToLoadScene();
+//    // From other classes call this using:
+//    // MetaManager.Instance.ChangeMetaStateToLoadScene();
+//}
+
 
 // READ THE WHOLE THREAD LINKED HERE ESPECIALLY THE COMMENTS 
 // Outlines multiple different ways to approach this issue
@@ -328,11 +238,19 @@ public class MetaManager : MonoBehaviour
 
 // Another way to handle MetaManager
 // https://answers.unity.com/questions/1695582/additive-scene-loading-or-dont-destroy-on-load.html
-//
-// I start the game with a scene that loads all my singletons
+// "I start the game with a scene that loads all my singletons
 // (like translation management, input management, etc.)
 // then sends the users to a new main menu scene
-// where they can do stuff before playing the game (loaded in separate game scenes). 
+// where they can do stuff before playing the game (loaded in separate game scenes)."
+
+
+// ASYNC LOAD MAIN MENU??
+// Doesn't work as it loads up the MetaManager again..
+// ASYNC UNLOAD CURRENT SCENE??
+// Doesn't work without Additive Loading as you cannot unload the only scene you have open
+// Change our Async loading to Additive mode and always have Scene 0 open?
+// Then we could take Main Menu out of DDOL mode
+
 
 // CHANGETO methods
 // Check conditions to switch MetaState 
@@ -407,6 +325,16 @@ public class MetaManager : MonoBehaviour
 //    }
 
 
+// HANDLE LEVEL RESTART 
+// TO DO IN THIS STATE
+// On Restart Level activated:
+// --MENU MGR-- Pause before activating RESTART screen
+// --MENU MGR-- Show RESTART screen
+// Click to
+// (1) Retry (eg to beat high score) OR
+// (2) Main Menu
+
+
 // HandleQuitApp
 // Initially had wrong order.. Needed to..
 // Change the MetaState > MetaState.QuitMenu
@@ -422,8 +350,28 @@ public class MetaManager : MonoBehaviour
 // Updating MetaState >> QuitApplication should automatically trigger
 // HandleLoadScene();
 
+
+// REFACTOR ALL BELOW INTO
+//
+// >> MetaUI = Possible
+// >> New MetaUI sub-component = better eg new MetaUIButtonHandler
+// >> LoadingHandler = NOT possible(?)
+// CANNOT be called by LoadingHandler because this sequence ENABLES LoadingHandler
+// when MetaUI enables LoadingScreenUI
+
+//public void UpdateCurrentSceneIndex()
+//{
+//    Instance.currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+//    Debug.Log("MetaManager: newCurrentSceneIndex = " + Instance.currentSceneIndex);
+//}
+
+
+
+
 // Get Enum member from int
 // https://answers.unity.com/questions/447240/get-enum-member-from-int.html
+
+
 
 
 // We have GameManager to handle transitions in a single game level. See GameManager notes.
