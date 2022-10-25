@@ -161,7 +161,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            MetaManager.Instance.ChangeMetaStateToLevelLose();
+            MetaManager.Instance.ChangeMetaStateToLevelRestart();
         }
     }
 

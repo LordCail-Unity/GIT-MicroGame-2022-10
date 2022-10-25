@@ -51,11 +51,11 @@ public class MetaUI : MonoBehaviour
         LoadingScreenUI.SetActive(state == MetaState.LoadScene);
         Debug.Log("MetaUI: LoadScene state: " + (state == MetaState.LoadScene).ToString());
 
-        LVLLoseUI.SetActive(state == MetaState.LevelLose);
-        Debug.Log("MetaUI: LevelLose state: " + (state == MetaState.LevelLose).ToString());
+        LVLLoseUI.SetActive(state == MetaState.LevelRestart);
+        Debug.Log("MetaUI: LevelLose state: " + (state == MetaState.LevelRestart).ToString());
 
-        LVLWinUI.SetActive(state == MetaState.LevelWin);
-        Debug.Log("MetaUI: LevelWin state: " + (state == MetaState.LevelWin).ToString());
+        LVLWinUI.SetActive(state == MetaState.LevelComplete);
+        Debug.Log("MetaUI: LevelWin state: " + (state == MetaState.LevelComplete).ToString());
 
         QuitMenuUI.SetActive(state == MetaState.QuitMenu);
         Debug.Log("MetaUI: QuitMenu state: " + (state == MetaState.QuitMenu).ToString());

@@ -122,6 +122,7 @@ public class LoadingHandler : MonoBehaviour
         yield return new WaitForSecondsRealtime(delaySecs);
 
         MetaManager.Instance.ChangeMetaStateToGameManager();
+
     }
 
 }

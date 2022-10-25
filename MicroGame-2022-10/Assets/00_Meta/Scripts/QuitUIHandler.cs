@@ -12,7 +12,7 @@ public class QuitUIHandler : MonoBehaviour
     public void MainMenu()
     {
         Debug.Log("Button: Main Menu");
-        MetaManager.Instance.ChangeMetaStateToMainMenu();
+        MetaManager.Instance.LoadMainMenuScene();
     }
     
 }

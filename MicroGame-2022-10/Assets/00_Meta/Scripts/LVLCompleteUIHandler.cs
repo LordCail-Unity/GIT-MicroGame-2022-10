@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class LVLWinUIHandler : MonoBehaviour
+public class LVLCompleteUIHandler : MonoBehaviour
 {
 
     public void NextLevel()
@@ -12,7 +12,7 @@ public class LVLWinUIHandler : MonoBehaviour
     public void MainMenu()
     {
         Debug.Log("Button: Main Menu");
-        MetaManager.Instance.ChangeMetaStateToMainMenu();
+        MetaManager.Instance.LoadMainMenuScene();
     }
 
 }

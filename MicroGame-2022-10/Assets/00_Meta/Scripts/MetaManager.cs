@@ -8,17 +8,17 @@ using UnityEngine.SceneManagement;
 // Tarodev set up global enum BELOW the class
 // We have moved it to the top for readability
 // Check how best to index number and reconfigure enum indexing
-// EG Could index them 10, 20, 30 etc or even 100, 200, 300, etc
-// to give room to add new enums
+// EG Could index them 10, 20, 30 etc (or even 100, 200, 300, etc)
+// to give room to add new enums (depending on how many you might need)
 
 public enum MetaState
 {
     SetupApp = 10,
-    MainMenu = 20,
-    LoadScene = 30,
-    GameManager = 40,
-    LevelLose = 50,
-    LevelWin = 60,
+    MainMenu = 20, 
+    LoadScene = 30, // Hand over to LoadingHandler
+    GameManager = 40, // Hand over to GameManager to manage the Level Gameplay
+    LevelRestart = 50, // Currently for Lose Game but could also be triggered mid-game from Pause Menu
+    LevelComplete = 60, // Currently On Win; Could also trigger Save functions
     QuitMenu = 70,
     QuitApp = 80
 }
@@ -53,13 +53,12 @@ public class MetaManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            UpdateMetaState(MetaState.SetupApp);
         }
         else
         {
             Destroy(gameObject);
         }
-
-        UpdateMetaState(MetaState.SetupApp);
     }
 
     private void Start()
@@ -87,10 +86,10 @@ public class MetaManager : MonoBehaviour
             case MetaState.GameManager:
                 HandleGameManager();
                 break;
-            case MetaState.LevelLose:
-                HandleLevelLose();
+            case MetaState.LevelRestart:
+                HandleLevelRestart();
                 break;
-            case MetaState.LevelWin:
+            case MetaState.LevelComplete:
                 HandleLevelWin();
                 break;
             case MetaState.QuitMenu:
@@ -129,33 +128,40 @@ public class MetaManager : MonoBehaviour
 
     public void ChangeMetaStateToLoadScene()
     {
-        // Check conditions to switch MetaState 
-        // If all conditions are met, change the MetaState
         Debug.Log("MetaManager.ChangeMetaStateToLoadScene");
 
         UpdateCurrentSceneIndex();
-
-        // ASYNC LOAD MAIN MENU??
-        // Doesn't work as it loads up the MetaManager again..
-
-        // ASYNC UNLOAD CURRENT SCENE??
-        // Doesn't work without Additive Loading as you cannot unload the only scene you have open
-        // Change our Async loading to Additive mode and always have Scene 0 open?
-        // Then we could take Main Menu out of DDOL mode
 
         // THIS CHECK MUST BE BEFORE LOADSCENE
         // Otherwise LoadingScreen will show up before QuitMenu
         // Just let the loading screen show?
 
+        if (Instance.sceneToLoad == Instance.mainMenuSceneIndex)
+        {
+            Debug.Log("Instance.sceneToLoad == Instance.mainMenuSceneIndex");
+            SceneManager.LoadScene(Instance.mainMenuSceneIndex);
+            Debug.Log("SceneManager.LoadScene(Instance.mainMenuSceneIndex)");
+            UpdateMetaState(MetaState.MainMenu);
+            return;
+        }
+
         if (Instance.sceneToLoad == Instance.finalSceneIndex)
         {
-            SceneManager.LoadSceneAsync(Instance.finalSceneIndex);
+            Debug.Log("Instance.sceneToLoad == Instance.finalSceneIndex");
+            SceneManager.LoadScene(Instance.finalSceneIndex);
+            Debug.Log("SceneManager.LoadScene(Instance.finalSceneIndex)");
             UpdateMetaState(MetaState.QuitMenu);
+            return;
         }
-        else
+
+        if (Instance.sceneToLoad != Instance.mainMenuSceneIndex && Instance.sceneToLoad != Instance.finalSceneIndex)
         {
+            Debug.Log("Instance.sceneToLoad != Instance.mainMenuSceneIndex ");
+            Debug.Log("&& Instance.sceneToLoad != Instance.finalSceneIndex");
             UpdateMetaState(MetaState.LoadScene);
+            return;
         }
+
     }
 
     private void HandleLoadScene()
@@ -168,8 +174,6 @@ public class MetaManager : MonoBehaviour
 
     public void ChangeMetaStateToGameManager()
     {
-        // Check conditions to switch MetaState 
-        // If all conditions are met, change the MetaState
         Debug.Log("MetaManager.ChangeMetaStateToGameManager");
 
         UpdateCurrentSceneIndex();
@@ -188,33 +192,23 @@ public class MetaManager : MonoBehaviour
         GameManager.Instance.UpdateGameState(GameState.StartLevel);
     }
 
-    public void ChangeMetaStateToLevelLose()
+    public void ChangeMetaStateToLevelRestart()
     {
-        Debug.Log("MetaManager.ChangeMetaStateToLevelLose");
-        UpdateMetaState(MetaState.LevelLose);
+        Debug.Log("MetaManager.ChangeMetaStateToLevelRestart");
+        UpdateMetaState(MetaState.LevelRestart);
     }
 
-    private void HandleLevelLose()
+    private void HandleLevelRestart()
     {
-        // MOVE THIS STATE TO META MANAGER?
-
+        // MOVED FROM GAME MANAGER
         Debug.Log("MetaManager: MetaState = " + _metaState);
-
         LoadThisScene();
-
-        // TO DO IN THIS STATE
-        // On Restart Level activated:
-        // --MENU MGR-- Pause before activating RESTART screen
-        // --MENU MGR-- Show RESTART screen
-        // Click to
-        // (1) Retry (eg to beat high score) OR
-        // (2) Main Menu
     }
 
     public void ChangeMetaStateToLevelWin()
     {
         Debug.Log("MetaManager.ChangeMetaStateToLevelWin");
-        UpdateMetaState(MetaState.LevelWin);
+        UpdateMetaState(MetaState.LevelComplete);
     }
 
     private void HandleLevelWin()
@@ -284,6 +278,7 @@ public class MetaManager : MonoBehaviour
         Debug.Log("MetaManager.LoadMainMenuScene");
 
         Instance.sceneToLoad = Instance.mainMenuSceneIndex;
+        Debug.Log("Instance.sceneToLoad = " + Instance.sceneToLoad.ToString());
 
         ChangeMetaStateToLoadScene();
         // From other classes call this using:
@@ -334,11 +329,19 @@ public class MetaManager : MonoBehaviour
 
 // Another way to handle MetaManager
 // https://answers.unity.com/questions/1695582/additive-scene-loading-or-dont-destroy-on-load.html
-//
-// I start the game with a scene that loads all my singletons
+// "I start the game with a scene that loads all my singletons
 // (like translation management, input management, etc.)
 // then sends the users to a new main menu scene
-// where they can do stuff before playing the game (loaded in separate game scenes). 
+// where they can do stuff before playing the game (loaded in separate game scenes)."
+
+
+// ASYNC LOAD MAIN MENU??
+// Doesn't work as it loads up the MetaManager again..
+// ASYNC UNLOAD CURRENT SCENE??
+// Doesn't work without Additive Loading as you cannot unload the only scene you have open
+// Change our Async loading to Additive mode and always have Scene 0 open?
+// Then we could take Main Menu out of DDOL mode
+
 
 // CHANGETO methods
 // Check conditions to switch MetaState 
@@ -411,6 +414,16 @@ public class MetaManager : MonoBehaviour
 //        MetaManager.Instance.UpdateMetaState(MetaState.EndGame);
 //        Debug.Log("MetaState >> EndGame");
 //    }
+
+
+// HANDLE LEVEL RESTART 
+// TO DO IN THIS STATE
+// On Restart Level activated:
+// --MENU MGR-- Pause before activating RESTART screen
+// --MENU MGR-- Show RESTART screen
+// Click to
+// (1) Retry (eg to beat high score) OR
+// (2) Main Menu
 
 
 // HandleQuitApp

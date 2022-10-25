@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class LVLLoseUIHandler : MonoBehaviour
+public class LVLRestartUIHandler : MonoBehaviour
 {
 
     public void RestartLevel()
@@ -12,7 +12,7 @@ public class LVLLoseUIHandler : MonoBehaviour
     public void MainMenu()
     {
         Debug.Log("Button: Main Menu");
-        MetaManager.Instance.ChangeMetaStateToMainMenu();
+        MetaManager.Instance.LoadMainMenuScene();
     }
 
 }
