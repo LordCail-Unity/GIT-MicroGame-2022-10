@@ -6,7 +6,7 @@ public class LVLWinUIHandler : MonoBehaviour
     public void NextLevel()
     {
         Debug.Log("Button: Continue");
-        MetaManager.Instance.ChangeMetaStateToLevelWin();
+        MetaManager.Instance.LoadNextScene();
     }
 
     public void MainMenu()

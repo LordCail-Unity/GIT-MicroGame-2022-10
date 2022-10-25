@@ -341,9 +341,41 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3594152810274028803, guid: 90682497de4de1f4db58e94d1882e135, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3594152810274028803, guid: 90682497de4de1f4db58e94d1882e135, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3594152810274028803, guid: 90682497de4de1f4db58e94d1882e135, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 3835300339220681877}
+    - target: {fileID: 3594152810274028803, guid: 90682497de4de1f4db58e94d1882e135, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3594152810274028803, guid: 90682497de4de1f4db58e94d1882e135, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: NextLevel
+      objectReference: {fileID: 0}
+    - target: {fileID: 3594152810274028803, guid: 90682497de4de1f4db58e94d1882e135, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: LVLWinUIHandler, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 3594152810274028803, guid: 90682497de4de1f4db58e94d1882e135, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 5877377489693858815, guid: 90682497de4de1f4db58e94d1882e135, type: 3}
       propertyPath: m_Name
       value: LVLWinUI
+      objectReference: {fileID: 0}
+    - target: {fileID: 5877377489693858815, guid: 90682497de4de1f4db58e94d1882e135, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 90682497de4de1f4db58e94d1882e135, type: 3}
@@ -357,6 +389,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2937464071151540379, guid: 90682497de4de1f4db58e94d1882e135, type: 3}
   m_PrefabInstance: {fileID: 726468719567109042}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &3835300339220681877 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4552389515323764519, guid: 90682497de4de1f4db58e94d1882e135, type: 3}
+  m_PrefabInstance: {fileID: 726468719567109042}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6594480264270749773}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3bc7262bec8ae38489f93bce458a4aed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &3816138511182844720
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -648,6 +691,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: LVLLoseUI
       objectReference: {fileID: 0}
+    - target: {fileID: 6931549215604261770, guid: 5f2f6bb23aecb804eb603e6e42f806b2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7833361837786606239, guid: 5f2f6bb23aecb804eb603e6e42f806b2, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 2995570515368455967}
+    - target: {fileID: 7833361837786606239, guid: 5f2f6bb23aecb804eb603e6e42f806b2, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: RestartLevel
+      objectReference: {fileID: 0}
+    - target: {fileID: 7833361837786606239, guid: 5f2f6bb23aecb804eb603e6e42f806b2, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: LVLLoseUIHandler, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 8759176471297278462, guid: 5f2f6bb23aecb804eb603e6e42f806b2, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -744,3 +803,14 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 8759176471297278462, guid: 5f2f6bb23aecb804eb603e6e42f806b2, type: 3}
   m_PrefabInstance: {fileID: 5554873141956165693}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2995570515368455967 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7243116626588757794, guid: 5f2f6bb23aecb804eb603e6e42f806b2, type: 3}
+  m_PrefabInstance: {fileID: 5554873141956165693}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3253587914975413175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37008638c0f78b047bc2b1ae5c8b9117, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

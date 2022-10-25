@@ -6,7 +6,7 @@ public class LVLLoseUIHandler : MonoBehaviour
     public void RestartLevel()
     {
         Debug.Log("Button: Replay");
-        MetaManager.Instance.ChangeMetaStateToLevelLose();
+        MetaManager.Instance.LoadThisScene();
     }
 
     public void MainMenu()
