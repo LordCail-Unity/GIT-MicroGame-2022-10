@@ -345,6 +345,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: QuitMenuUI
       objectReference: {fileID: 0}
+    - target: {fileID: 8807459123198052569, guid: 2bfc8485d8130344990722796059875a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2bfc8485d8130344990722796059875a, type: 3}
 --- !u!1 &5678973886595832809 stripped
